@@ -15,20 +15,24 @@
 #define CHARMAP_MASK    (CHARMAP_SIZE * CHARMAP_SIZE - 1)
 #define INFO_PANEL_ROWS 3
 #define INFO_PANEL_SIZE CHAR_HEIGHT * INFO_PANEL_ROWS
-#define WINDOW_WIDTH    (GAME_SIZE * TILE_SIZE)
-#define WINDOW_HEIGHT   (WINDOW_WIDTH + INFO_PANEL_SIZE)
+#define GAME_WIDTH      (GAME_SIZE * TILE_SIZE)
 
 #define SAVE_FILE_NAME "snake_game.save"
 #define CONF_FILE_NAME "snake.config"
 
-#define INITIAL_SNAKE_SIZE 2
+#define INITIAL_SNAKE_SIZE 5
 #define INITIAL_SNAKE_X    0
 #define INITIAL_SNAKE_Y    0
 
+#define APPLE_TIMER_WIDTH 16
+#define APPLE_TIMER_CAP   20 * FRAMES_PER_SECOND
 #define TIME_SCALE        .2
 #define FRAMES_PER_SECOND 5
 #define ANIMATION_SIZE    2 // pixels (how much bigger)
 #define ANIMATION_LENGHT  ((ANIMATION_SIZE << 1) - 1)
+
+#define WINDOW_WIDTH    (GAME_WIDTH + APPLE_TIMER_WIDTH)
+#define WINDOW_HEIGHT   (GAME_WIDTH + INFO_PANEL_SIZE)
 
 const unsigned long target_frame_duration = 1000 / FRAMES_PER_SECOND;
 
@@ -57,6 +61,7 @@ typedef struct {
     Entity berry;
     Entity * snake;
     int snake_size;
+    int apple_timer;
     struct tm elapsed_time;
     float time_scale;
     int dx, dy;
@@ -107,7 +112,7 @@ int SDL_RenderText(
 ) {
     static float scale = CHAR_HEIGHT / (float) CHAR_WIDTH;
     SDL_Rect src_rect = { 0, 0, CHAR_WIDTH, CHAR_WIDTH },
-             dst_rect = { x, WINDOW_WIDTH + y, CHAR_WIDTH * scale, CHAR_WIDTH * scale };
+             dst_rect = { x, GAME_WIDTH + y, CHAR_WIDTH * scale, CHAR_WIDTH * scale };
 
     SDL_SetRenderDrawColor(renderer, fg.r, fg.g, fg.b, 255);
 
@@ -129,7 +134,7 @@ void draw_text(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_Color fg = Color_FOREGROUND;
     SDL_Color bg = Color_BLACK;
 
-    SDL_Rect bg_rect = (SDL_Rect) { 0, WINDOW_WIDTH, WINDOW_WIDTH, INFO_PANEL_SIZE };
+    SDL_Rect bg_rect = (SDL_Rect) { 0, GAME_WIDTH, WINDOW_WIDTH, INFO_PANEL_SIZE };
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
     SDL_RenderFillRect(renderer, &bg_rect);
 
@@ -148,11 +153,37 @@ void draw_text(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_RenderText(renderer, charmap, string, fg, 0, CHAR_HEIGHT);
 }
 
+void draw_apple_timer(SDL_Renderer * renderer, Game * game) {
+    SDL_Color color = game->apple.color;
+    SDL_Color bg = Color_BLACK;
+
+    SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
+
+    SDL_Rect rect = (SDL_Rect) {
+        .x = GAME_WIDTH,
+        .y = 0,
+        .w = APPLE_TIMER_WIDTH,
+        .h = GAME_WIDTH,
+    };
+    SDL_RenderFillRect(renderer, &rect);
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+
+    rect = (SDL_Rect) {
+        .x = GAME_WIDTH,
+        .y = 0,
+        .w = APPLE_TIMER_WIDTH,
+        .h = GAME_WIDTH / (APPLE_TIMER_CAP / (float)game->apple_timer++),
+    };
+    SDL_RenderFillRect(renderer, &rect);
+}
+
 void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_Color bg = Color_BACKGROUND;
 
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
     SDL_RenderClear(renderer);
+    draw_apple_timer(renderer, game);
 
     Entity * snake = game->snake;
 
@@ -166,10 +197,11 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
 
     draw_text(renderer, game, charmap);
 
+
     SDL_RenderPresent(renderer);
 }
 
-void on_outofbounds(Game * game) {
+void handle_outofbounds(Game * game) {
     int *dx = &game->dx, *dy = &game->dy;
     // undo move
     game->snake[0].x -= *dx;
@@ -257,10 +289,11 @@ void new_game(Game * game) {
     game->elapsed_time = (struct tm) { 0 };
     game->time_scale = 1.0;
     game->ongoing = true;
+    game->apple_timer = 0;
     
     snake_init(&(game->snake), game->snake_size);   
 
-    random_position(game, &game->apple);
+    game->apple.x = game->apple.y = -100;
     random_position(game, &game->berry);
 }
 
@@ -289,8 +322,11 @@ void snake_move(Game * game) {
 
 
     if (is_overlapping(*snake, &(game->apple))) {
+        // shorten snake?
         snake_resize(snake, snake_size);
-        
+        game->apple.x = game->apple.y = -100;
+        game->apple_timer = 0;
+    } else if (game->apple_timer == APPLE_TIMER_CAP) {
         game->ongoing = random_position(game, &(game->apple));
     }
     if (is_overlapping(*snake, &(game->berry))) {
@@ -304,7 +340,7 @@ void snake_move(Game * game) {
     (*snake)[0] = (Entity) { headx, heady, ANIMATION_SIZE, Color_SNAKE_HEAD };
 
     if (is_outofbounds(&(*snake)[0])) {
-        on_outofbounds(game);
+        handle_outofbounds(game);
     }
 }
 
@@ -388,7 +424,7 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
         }
 
         if (!game->ongoing) {
-            // printf("Press 'n' to start a new game!\n"); 
+            printf("Press 'n' to start a new game!\n"); 
             continue;
         }
 
