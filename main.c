@@ -25,6 +25,7 @@
 #define INITIAL_SNAKE_X    0
 #define INITIAL_SNAKE_Y    0
 
+#define TIME_SCALE        .2
 #define FRAMES_PER_SECOND 5
 #define ANIMATION_SIZE    2 // pixels (how much bigger)
 #define ANIMATION_LENGHT  ((ANIMATION_SIZE << 1) - 1)
@@ -40,9 +41,9 @@ const unsigned long target_frame_duration = 1000 / FRAMES_PER_SECOND;
 #define Color_BLACK      (SDL_Color) { 0  , 0  , 0  , 0 }
 #define Color_FOREGROUND (SDL_Color) { 210, 218, 226, 0 }
 
-#define inctime(time) do { \
-    time.tm_sec++;         \
-    mktime(&time);         \
+#define inctime(time, seconds) do { \
+    time.tm_sec += seconds;         \
+    mktime(&time);                  \
 } while ( 0 )
 
 typedef struct {
@@ -57,9 +58,16 @@ typedef struct {
     Entity * snake;
     int snake_size;
     struct tm elapsed_time;
+    float time_scale;
     int dx, dy;
     bool ongoing;
 } Game;
+
+#define is_outofbounds(a) \
+    ((a)->x < 0 || (a)->x >= GAME_SIZE || (a)->y < 0 || (a)->y >= GAME_SIZE)
+
+#define is_overlapping(a, b) \
+    ((a)->x == (b)->x && (a)->y == (b)->y)
 
 void draw_entity(SDL_Renderer * renderer, Entity * entity) {
     SDL_Color color = entity->color;
@@ -72,7 +80,7 @@ void draw_entity(SDL_Renderer * renderer, Entity * entity) {
         entity->x * TILE_SIZE - frame,
         entity->y * TILE_SIZE - frame,
         TILE_SIZE + 2 * frame,
-        TILE_SIZE + 2 * frame
+        TILE_SIZE + 2 * frame,
     };
 
     border_rect = (SDL_Rect) {
@@ -134,8 +142,8 @@ void draw_text(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_RenderText(renderer, charmap, string, fg, 0, 0);
 
     sprintf(string,
-        "Mandatory: 1,2,3,4\n"
-        "Optional:  A,B,C,D,E,F,G,H"
+        "Mandatory: 1,2,3,4 %f\n"
+        "Optional:  A,B,C,D,E,F,G,H", game->time_scale
     );
     SDL_RenderText(renderer, charmap, string, fg, 0, CHAR_HEIGHT);
 }
@@ -161,8 +169,34 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_RenderPresent(renderer);
 }
 
-bool is_overlapping(Entity * a, Entity * b) {
-    return a->x == b->x && a->y == b->y;
+void on_outofbounds(Game * game) {
+    int *dx = &game->dx, *dy = &game->dy;
+    // undo move
+    game->snake[0].x -= *dx;
+    game->snake[0].y -= *dy;
+
+    if        (*dx == -1) { // moving left -> move up
+        *dy = *dx;
+        *dx = 0;
+    } else if (*dx == +1) { // moving right -> move down
+        *dy = *dx;
+        *dx = 0;
+    } else if (*dy == -1) { // moving up -> move right
+        *dx = -*dy;
+        *dy = 0;
+    } else if (*dy == +1) { // moving down -> move left
+        *dx = -*dy;
+        *dy = 0;
+    }
+
+    game->snake[0].x += *dx;
+    game->snake[0].y += *dy;
+
+    if (is_outofbounds(&game->snake[0])) {
+        // rotate movement
+        game->snake[0].x += (*dx *= -1) * 2;
+        game->snake[0].y += (*dy *= -1) * 2;
+    }
 }
 
 bool random_position(Game * game, Entity * entity) {
@@ -221,6 +255,7 @@ void new_game(Game * game) {
     game->snake_size = INITIAL_SNAKE_SIZE;
     game->dx = game->dy = 0;
     game->elapsed_time = (struct tm) { 0 };
+    game->time_scale = 1.0;
     game->ongoing = true;
     
     snake_init(&(game->snake), game->snake_size);   
@@ -267,6 +302,10 @@ void snake_move(Game * game) {
     memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
 
     (*snake)[0] = (Entity) { headx, heady, ANIMATION_SIZE, Color_SNAKE_HEAD };
+
+    if (is_outofbounds(&(*snake)[0])) {
+        on_outofbounds(game);
+    }
 }
 
 void update_animations(Game * game) {
@@ -349,7 +388,7 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
         }
 
         if (!game->ongoing) {
-            printf("Press 'n' to start a new game!\n"); 
+            // printf("Press 'n' to start a new game!\n"); 
             continue;
         }
 
@@ -357,7 +396,12 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
             snake_move(game);
 
             if (elapsed_frames++ % FRAMES_PER_SECOND == 0) {
-                inctime(game->elapsed_time);
+                int prev_minutes = game->elapsed_time.tm_min;
+                inctime(game->elapsed_time, 1);
+                if (prev_minutes != game->elapsed_time.tm_min) {
+                    game->time_scale += TIME_SCALE;
+                }
+
                 elapsed_frames = elapsed_frames % FRAMES_PER_SECOND;
             }
         }
@@ -366,8 +410,8 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
         render_frame(renderer, game, charmap);
 
         frame_duration = SDL_GetTicks() - frame_start;
-        if (frame_duration < target_frame_duration) {
-            SDL_Delay(target_frame_duration - frame_duration);
+        if (frame_duration * game->time_scale < target_frame_duration) {
+            SDL_Delay(target_frame_duration - frame_duration * game->time_scale);
         }
     }
     return 0;
@@ -388,23 +432,25 @@ int main() {
 
     if (SDL_Init ( SDL_INIT_VIDEO ) < 0) {
         fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
-        return -1;
+        return EXIT_FAILURE;
     }
 
     SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer);
     if (window == NULL) {
         fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
-        return -1;
+        return EXIT_FAILURE;
     }
 
     SDL_Surface * charmap_surface = SDL_LoadBMP("charmap.bmp");
     if (charmap_surface == NULL) {
         fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
+        return EXIT_FAILURE;
     }
 
     SDL_Texture * charmap = SDL_CreateTextureFromSurface(renderer, charmap_surface);
     if (charmap == NULL) {
         fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
+        return EXIT_FAILURE;
     }
 
     int exit_code = main_loop(renderer, &game, charmap);
