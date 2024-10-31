@@ -28,6 +28,9 @@
 #define FRAMES_PER_SECOND 5
 #define FRAMES_MAX_COUNT  100000
 
+#define APPLE_SCORE 2
+#define BERRY_SCORE 1
+
 #define APPLE_TIMER_WIDTH 16
 #define APPLE_TIMER_CAP   20 // seconds
 #define TIME_SCALE        .2
@@ -78,8 +81,10 @@ typedef struct Game {
     Entity * snake;
     int snake_size;
     int apple_timer;
+    int score;
     struct tm elapsed_time;
     float time_scale;
+    int seed;
     Porter porters[PORTER_COUNT * 2];
     int dx, dy;
     bool ongoing;
@@ -93,6 +98,10 @@ typedef struct Game {
 #define _is_overlapping(a, b) \
     ((a)->x == (b)->x && (a)->y == (b)->y)
 #define is_overlapping(a, b) _is_overlapping((Point*)a, (Point*)b)
+
+int save_rand(Game * game) {
+    return game->seed = rand();
+}
 
 void draw_entity(SDL_Renderer * renderer, Entity * entity) {
     SDL_Color color = entity->color;
@@ -164,16 +173,22 @@ void draw_text(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     strftime(string, sizeof(string),
         "Elapsed Time: %M:%S", &game->elapsed_time
     );
-    
     SDL_RenderText(
         renderer, charmap,
         string, fg,
         0, GAME_WIDTH, CHAR_HEIGHT
     );
 
+    SDL_RenderText(
+        renderer, charmap,
+        string, fg,
+        GAME_WIDTH - sprintf(string, "Score: %04d", game->score) * CHAR_HEIGHT,
+        GAME_WIDTH, CHAR_HEIGHT
+    );
+
     sprintf(string,
-        "Mandatory: 1,2,3,4 %f\n"
-        "Optional:  A,B,C,D,E,F,G,H", game->time_scale
+        "Mandatory: 1,2,3,4\n"
+        "Optional:  A,B,C,D,E,F,G,H"
     );
     SDL_RenderText(
         renderer, charmap,
@@ -280,8 +295,8 @@ bool random_position(Game * game, Entity * entity) {
         return valid;
     do {
         valid = true;
-        entity->x = rand() % GAME_SIZE;
-        entity->y = rand() % GAME_SIZE;
+        entity->x = save_rand(game) % GAME_SIZE;
+        entity->y = save_rand(game) % GAME_SIZE;
 
         for (int i = 0; i < game->snake_size; i++) {
             if (is_overlapping(&(game->snake[i]), entity)) {
@@ -328,6 +343,7 @@ void snake_init(Entity ** snake, int size) {
     file_fn(file, "%d %d %d %f\n",                          \
         g->dx, g->dy,                                       \
         g->apple_timer, g->time_scale);                     \
+    file_fn(file, "%d %d\n", g->score, g->seed);            \
     file_fn(file, "%d %d\n",                                \
         g->elapsed_time.tm_min,                             \
         g->elapsed_time.tm_sec);                            \
@@ -351,6 +367,7 @@ void load_game(Game * game) {
         return;
     }
     save_file_operattion(fscanf, file, &game, game);
+    srand(game->seed);
     fclose(file);
 }
 
@@ -371,7 +388,10 @@ void new_game(Game * game) {
     game->elapsed_time = (struct tm) { 0 };
     game->time_scale = 1.0;
     game->ongoing = true;
-    game->apple_timer = 0;
+    game->seed = time( NULL );
+    game->apple_timer = game->score = 0;
+
+    srand(game->seed);
     
     snake_init(&(game->snake), game->snake_size);   
     porters_init(game);
@@ -405,8 +425,8 @@ void snake_move(Game * game) {
 
 
     if (is_overlapping(*snake, &(game->apple))) {
-        int apple_action_index = rand() % 2;
-
+        int apple_action_index = save_rand(game) % 2;
+        game->score += APPLE_SCORE;
         game->apple_actions[apple_action_index](game);
         game->apple.x = game->apple.y = -100;
         game->apple_timer = 0;
@@ -415,7 +435,7 @@ void snake_move(Game * game) {
     }
     if (is_overlapping(*snake, &(game->berry))) {
         snake_resize(snake, *snake_size += 1);
-
+        game->score += BERRY_SCORE;
         game->ongoing = random_position(game, &(game->berry));
     }
 
@@ -560,7 +580,7 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
 
 
 int main() {
-    srand(time( NULL ));
+    // srand(time( NULL ));
 
     SDL_Window * window     = NULL;
     SDL_Renderer * renderer = NULL;
