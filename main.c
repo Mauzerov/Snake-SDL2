@@ -312,7 +312,7 @@ void handle_outofbounds(Game * game) {
     }
 }
 
-bool random_position(Game * game, Entity * entity) {
+bool _random_position(Game * game, Point * entity) {
     bool valid = false;
     if (game->snake_size > GAME_SIZE * GAME_SIZE)
         return valid;
@@ -329,7 +329,8 @@ bool random_position(Game * game, Entity * entity) {
         }
 
         for (int i = 0; i < PORTER_COUNT * 2; i++) {
-            if ((Entity *)&game->porters[i] != entity && is_overlapping(&game->snake[i], &game->porters[i])) {
+            if ((Point *)&game->porters[i] != entity
+                    && is_overlapping(&game->snake[i], &game->porters[i])) {
                 valid = false;
                 break;
             }
@@ -337,6 +338,8 @@ bool random_position(Game * game, Entity * entity) {
     } while (!valid);
     return valid;
 }
+
+#define random_position(game, object) _random_position(game, (Point*)object)
 
 void snake_init(Entity ** snake, int size) {
     // if snake is not initilized
