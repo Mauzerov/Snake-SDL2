@@ -259,6 +259,29 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_RenderPresent(renderer);
 }
 
+void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap) {
+    // TODO: implement leaderboard
+    static int line_num = 8;
+
+    SDL_Color bg = Color_BLACK;
+    SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
+    SDL_Rect rect = { 
+        0, (GAME_WIDTH >> 1) - (line_num >> 1) * CHAR_HEIGHT, 
+        GAME_WIDTH, CHAR_HEIGHT * (2 + line_num)
+    };
+    SDL_RenderFillRect(renderer, &rect);
+
+    static char * string = 
+        "Press 'n' to start a new game!\n"
+        "Press 'ESC' to quit!"; 
+
+    SDL_RenderText(
+        renderer, charmap, string, Color_FOREGROUND,
+        0, GAME_WIDTH >> 1, CHAR_HEIGHT
+    );
+    SDL_RenderPresent(renderer);
+}
+
 void handle_outofbounds(Game * game) {
     int *dx = &game->dx, *dy = &game->dy;
     // undo move
