@@ -87,7 +87,7 @@ typedef struct Game {
     int seed;
     Porter porters[PORTER_COUNT * 2];
     int dx, dy;
-    bool ongoing;
+    int ongoing;
     void (*apple_actions[2])(struct Game*);
 } Game;
 
@@ -387,7 +387,7 @@ void new_game(Game * game) {
     game->dx = game->dy = 0;
     game->elapsed_time = (struct tm) { 0 };
     game->time_scale = 1.0;
-    game->ongoing = true;
+    game->ongoing = 1;
     game->seed = time( NULL );
     game->apple_timer = game->score = 0;
 
@@ -413,7 +413,7 @@ void snake_move(Game * game) {
 
     for (int i = 1; i < *snake_size; i++) {
         if (is_overlapping(*snake, &(*snake)[i])) {
-            game->ongoing = false;
+            game->ongoing = 0;
             return;
         }
     }
@@ -547,28 +547,30 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
             }
         }
 
-        if (!game->ongoing) {
-            printf("Press 'n' to start a new game!\n"); 
-            continue;
-        }
-
-        if (game->dx != 0 || game->dy != 0) {
-            snake_move(game);
-
-            // handle current play time
-            if (elapsed_frames++ % FRAMES_PER_SECOND == 0) {
-                inctime(game->elapsed_time, 1);
+        if (game->ongoing <= 0) {
+            if (game->ongoing == 0) {
+                game->ongoing = -1;
+                render_end_screen(renderer, charmap);
             }
-            // handle speed-up
-            if (elapsed_frames % (FRAMES_PER_SECOND * SCALE_INTERVAL) == 0) {
-                game->time_scale += TIME_SCALE;
+        } else {
+            if (game->dx != 0 || game->dy != 0) {
+                snake_move(game);
+
+                // handle current play time
+                if (elapsed_frames++ % FRAMES_PER_SECOND == 0) {
+                    inctime(game->elapsed_time, 1);
+                }
+                // handle speed-up
+                if (elapsed_frames % (FRAMES_PER_SECOND * SCALE_INTERVAL) == 0) {
+                    game->time_scale += TIME_SCALE;
+                }
+
+                elapsed_frames = elapsed_frames % FRAMES_MAX_COUNT;
             }
 
-            elapsed_frames = elapsed_frames % FRAMES_MAX_COUNT;
+            update_animations(game);
+            render_frame(renderer, game, charmap);
         }
-
-        update_animations(game);
-        render_frame(renderer, game, charmap);
 
         frame_duration = SDL_GetTicks() - frame_start;
         if (frame_duration * game->time_scale < target_frame_duration) {
