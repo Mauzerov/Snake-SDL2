@@ -1,6 +1,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include "point.h"
+
 #include <SDL2/SDL.h>
 
 #define ALTERNATE_SIZES 2
@@ -14,7 +16,8 @@ void render_square_image(
     SDL_Renderer * renderer,
     Image * image,
     SDL_Rect * rect,
-    int animation_frame
+    int animation_frame,
+    Direction direction
 );
 
 SDL_Texture * create_texture(

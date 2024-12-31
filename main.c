@@ -5,6 +5,9 @@
 #include <assert.h>
 #include <math.h>
 
+#include "image.h"
+#include "snake.h"
+
 #include <SDL2/SDL.h>
 
 #define GAME_SIZE       16 // playable area size
@@ -45,6 +48,8 @@
 
 const unsigned long target_frame_duration = 1000 / FRAMES_PER_SECOND;
 
+Image * SNAKE_TEXTURES[SNAKE_TEXTURE_COUNT];
+
 /// colors from: https://flatuicolors.com/palette/se
 #define Color_SNAKE_TAIL (SDL_Color) { 11 , 232, 129, 0 }
 #define Color_SNAKE_HEAD (SDL_Color) { 5  , 196, 107, 0 }
@@ -59,9 +64,9 @@ const unsigned long target_frame_duration = 1000 / FRAMES_PER_SECOND;
     mktime(&time);                  \
 } while ( 0 )
 
-typedef struct {
-    int x, y;
-} Point;
+// typedef struct {
+//     int x, y;
+// } Point;
 
 typedef struct Porter {
     int x, y; // indirect inheritance (Point)
@@ -244,15 +249,23 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
         draw_porter(renderer, charmap, &game->porters[i]);
     }
 
-    Entity * snake = game->snake;
+    Snake snake = { .size = game->snake_size, };
+    snake.body = malloc(sizeof(Point) * snake.size);
+    memcpy(snake.textures, SNAKE_TEXTURES, sizeof(Image *) * 3);
+    for (size_t i = 0; i < snake.size; i++) {
+        snake.body[i].x = game->snake[i].x;
+        snake.body[i].y = game->snake[i].y;
+    }
 
     draw_entity(renderer, &(game->apple));
     draw_entity(renderer, &(game->berry));
-    
-    for (int i = 1; i < game->snake_size; i++) {
-        draw_entity(renderer, &(snake[i]));
-    }
-    draw_entity(renderer, &(snake[0]));
+
+    render_snake(renderer, &snake);
+
+    // for (int i = 1; i < game->snake_size; i++) {
+    //     draw_entity(renderer, &(snake[i]));
+    // }
+    // draw_entity(renderer, &(snake[0]));
 
     draw_text(renderer, game, charmap);
 
@@ -631,29 +644,89 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    SDL_Surface * charmap_surface = SDL_LoadBMP("charmap.bmp");
+    // SDL_Surface * charmap_surface = SDL_LoadBMP("charmap.bmp");
 
-    if (charmap_surface == NULL) {
-        fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
-        return EXIT_FAILURE;
+    // if (charmap_surface == NULL) {
+    //     fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
+    //     return EXIT_FAILURE;
+    // }
+
+    // SDL_SetColorKey(
+    //     charmap_surface,
+    //     SDL_TRUE,
+    //     SDL_MapRGB(charmap_surface->format, 0, 0, 0)
+    // );
+
+    // SDL_Texture * charmap = SDL_CreateTextureFromSurface(renderer, charmap_surface);
+    // if (charmap == NULL) {
+    //     fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
+    //     return EXIT_FAILURE;
+    // }
+
+    SDL_Texture * charmap = create_texture(renderer, "charmap.bmp");
+
+    
+    SDL_Texture * snake   = create_texture(renderer, "snake.bmp");
+
+    #ifdef TEST
+    Snake * s = malloc(sizeof(Snake));
+    s->size = 5;
+    s->body   = malloc(sizeof(Point) * s->size);
+    for (size_t i = 0; i < s->size; i++) {
+        s->body[i].x = i, s->body[i].y = 0;
     }
 
-    SDL_SetColorKey(
-        charmap_surface,
-        SDL_TRUE,
-        SDL_MapRGB(charmap_surface->format, 0, 0, 0)
+    s->body[s->size - 1].x--;
+    s->body[s->size - 1].y++;
+    #endif
+
+    Image * tail = create_image(
+        renderer,
+        snake,
+        (SDL_Rect) { 0, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_SNAKE_TAIL
+    );
+    Image * body = create_image(
+        renderer,
+        snake,
+        (SDL_Rect) { TILE_SIZE * 1, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_SNAKE_TAIL
+    );
+    Image * head = create_image(
+        renderer,
+        snake,
+        (SDL_Rect) { TILE_SIZE * 2, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_SNAKE_HEAD
     );
 
-    SDL_Texture * charmap = SDL_CreateTextureFromSurface(renderer, charmap_surface);
-    if (charmap == NULL) {
-        fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
-        return EXIT_FAILURE;
-    }
+    SNAKE_TEXTURES[0] = tail;
+    SNAKE_TEXTURES[1] = body;
+    SNAKE_TEXTURES[2] = head;
+    #ifdef TEST
+    memcpy(s->textures, SNAKE_TEXTURES, sizeof(Image *) * 3);
+    // s->textures = SNAKE_TEXTURES;
 
+    SDL_Event e;
+    SDL_Rect rect = { 0, 0, TILE_SIZE, TILE_SIZE };
+    int time = 0;
+    while (1) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                return 0;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+        SDL_RenderClear(renderer);
+        render_snake(renderer, s);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(500);
+    }
+    return 69;
+    #endif
     int exit_code = main_loop(renderer, &game, charmap);
 
     SDL_DestroyTexture(charmap);
-    SDL_FreeSurface(charmap_surface);
+    
     SDL_DestroyWindow(window);
     //Quit SDL subsystems
     SDL_Quit();

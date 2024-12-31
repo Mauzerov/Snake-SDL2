@@ -1,12 +1,14 @@
 #include <assert.h>
 
 #include "image.h"
+#include "snake.h"
 
 void render_square_image(
     SDL_Renderer * renderer,
     Image * image,
     SDL_Rect * rect,
-    int animation_frame
+    int animation_frame,
+    Direction direction
 ) {
     assert(image->height % image->width == 0 && "Image isn't a square nor a proper rectangle!");
 
@@ -17,7 +19,18 @@ void render_square_image(
         0, frame * image->width,
         image->width, image->width
     };
-    SDL_RenderCopy(renderer, image->texture, &src_rect, rect);
+    if (direction == Unknown)
+        return;
+
+    SDL_RenderCopyEx(
+        renderer,
+        image->texture,
+        &src_rect,
+        rect,
+        90. * (direction - 1),
+        NULL,
+        0
+    );  
 }
 
 SDL_Texture * remove_backgroud(
