@@ -27,7 +27,7 @@ void render_square_image(
         image->texture,
         &src_rect,
         rect,
-        90. * (direction - 1),
+        90. * (direction),
         NULL,
         0
     );  

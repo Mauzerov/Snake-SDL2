@@ -5,8 +5,6 @@
 
 #include <SDL2/SDL.h>
 
-#define ALTERNATE_SIZES 2
-
 typedef struct {
     int width, height;
     SDL_Texture * texture;

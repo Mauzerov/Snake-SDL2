@@ -108,32 +108,23 @@ int save_rand(Game * game) {
     return game->seed = rand();
 }
 
-void draw_entity(SDL_Renderer * renderer, Entity * entity) {
-    SDL_Color color = entity->color;
-    SDL_Rect fill_rect, border_rect;
-
+void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture) {
     entity->animation_frame = entity->animation_frame % ANIMATION_LENGHT;
-    int frame = labs(entity->animation_frame - ANIMATION_SIZE);
 
-    fill_rect = (SDL_Rect) {
-        entity->x * TILE_SIZE - frame,
-        entity->y * TILE_SIZE - frame,
-        TILE_SIZE + 2 * frame,
-        TILE_SIZE + 2 * frame,
+    SDL_Rect fill_rect = (SDL_Rect) {
+        entity->x * TILE_SIZE,
+        entity->y * TILE_SIZE,
+        TILE_SIZE,
+        TILE_SIZE,
     };
 
-    border_rect = (SDL_Rect) {
-        fill_rect.x - 1,
-        fill_rect.y - 1,
-        fill_rect.w + 2,
-        fill_rect.h + 2,
-    };
-
-    SDL_SetRenderDrawColor(renderer, color.r * .9, color.g * .9, color.b * .9, 255);
-    SDL_RenderDrawRect(renderer, &border_rect);
-
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-    SDL_RenderFillRect(renderer, &fill_rect);
+    render_square_image(
+        renderer,
+        texture,
+        &fill_rect,
+        entity->animation_frame,
+        0
+    );
 }
 
 int SDL_RenderText(
@@ -249,26 +240,13 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
         draw_porter(renderer, charmap, &game->porters[i]);
     }
 
-    Snake snake = { .size = game->snake_size, };
-    snake.body = malloc(sizeof(Point) * snake.size);
-    memcpy(snake.textures, SNAKE_TEXTURES, sizeof(Image *) * 3);
-    for (size_t i = 0; i < snake.size; i++) {
-        snake.body[i].x = game->snake[i].x;
-        snake.body[i].y = game->snake[i].y;
-    }
+    draw_entity(renderer, &(game->apple), game->textures[Texture_APPLE]);
+    draw_entity(renderer, &(game->berry), game->textures[Texture_BERRY]);
 
-    draw_entity(renderer, &(game->apple));
-    draw_entity(renderer, &(game->berry));
-
-    render_snake(renderer, &snake);
-
-    // for (int i = 1; i < game->snake_size; i++) {
-    //     draw_entity(renderer, &(snake[i]));
-    // }
-    // draw_entity(renderer, &(snake[0]));
+    render_snake(renderer, game->snake, game->snake_size, game->textures);
 
     draw_text(renderer, game, charmap);
-
+    
     SDL_RenderPresent(renderer);
 }
 
@@ -619,6 +597,44 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     return 0;
 }
 
+void load_game_textures(
+    SDL_Renderer * renderer,
+    Game * game,
+    SDL_Texture * texture
+) {
+    Image * tail = create_image(
+        renderer, texture,
+        (SDL_Rect) { 0, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_SNAKE_TAIL
+    );
+    Image * body = create_image(
+        renderer, texture,
+        (SDL_Rect) { TILE_SIZE * 1, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_SNAKE_TAIL
+    );
+    Image * head = create_image(
+        renderer, texture,
+        (SDL_Rect) { TILE_SIZE * 2, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_SNAKE_TAIL
+    );
+    Image * apple = create_image(
+        renderer, texture,
+        (SDL_Rect) { TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_APPLE
+    );
+    Image * berry = create_image(
+        renderer, texture,
+        (SDL_Rect) { TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE * 2 },
+        Color_BERRY
+    );
+
+    game->textures[0] = tail;
+    game->textures[1] = body;
+    game->textures[2] = head;
+    game->textures[3] = apple;
+    game->textures[4] = berry;
+}
+
 
 int main() {
     // srand(time( NULL ));
@@ -644,85 +660,12 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    // SDL_Surface * charmap_surface = SDL_LoadBMP("charmap.bmp");
-
-    // if (charmap_surface == NULL) {
-    //     fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
-    //     return EXIT_FAILURE;
-    // }
-
-    // SDL_SetColorKey(
-    //     charmap_surface,
-    //     SDL_TRUE,
-    //     SDL_MapRGB(charmap_surface->format, 0, 0, 0)
-    // );
-
-    // SDL_Texture * charmap = SDL_CreateTextureFromSurface(renderer, charmap_surface);
-    // if (charmap == NULL) {
-    //     fprintf(stderr, "Could Not Initialize!: %d %s\n", __LINE__, SDL_GetError());
-    //     return EXIT_FAILURE;
-    // }
-
     SDL_Texture * charmap = create_texture(renderer, "charmap.bmp");
 
-    
     SDL_Texture * snake   = create_texture(renderer, "snake.bmp");
 
-    #ifdef TEST
-    Snake * s = malloc(sizeof(Snake));
-    s->size = 5;
-    s->body   = malloc(sizeof(Point) * s->size);
-    for (size_t i = 0; i < s->size; i++) {
-        s->body[i].x = i, s->body[i].y = 0;
-    }
+    load_game_textures(renderer, &game, snake);
 
-    s->body[s->size - 1].x--;
-    s->body[s->size - 1].y++;
-    #endif
-
-    Image * tail = create_image(
-        renderer,
-        snake,
-        (SDL_Rect) { 0, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * body = create_image(
-        renderer,
-        snake,
-        (SDL_Rect) { TILE_SIZE * 1, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * head = create_image(
-        renderer,
-        snake,
-        (SDL_Rect) { TILE_SIZE * 2, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_HEAD
-    );
-
-    SNAKE_TEXTURES[0] = tail;
-    SNAKE_TEXTURES[1] = body;
-    SNAKE_TEXTURES[2] = head;
-    #ifdef TEST
-    memcpy(s->textures, SNAKE_TEXTURES, sizeof(Image *) * 3);
-    // s->textures = SNAKE_TEXTURES;
-
-    SDL_Event e;
-    SDL_Rect rect = { 0, 0, TILE_SIZE, TILE_SIZE };
-    int time = 0;
-    while (1) {
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
-                return 0;
-            }
-        }
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-        SDL_RenderClear(renderer);
-        render_snake(renderer, s);
-        SDL_RenderPresent(renderer);
-        SDL_Delay(500);
-    }
-    return 69;
-    #endif
     int exit_code = main_loop(renderer, &game, charmap);
 
     SDL_DestroyTexture(charmap);

@@ -7,11 +7,14 @@ typedef struct {
 
 
 typedef enum {
-    Unknown = 0,
-    Right   = 1,
+    Right = 0,
     Down,
     Left,
     Up,
+    Unknown,
 } Direction;
+
+#define get_direction(a, b) _get_direction((Point *)a, (Point *)b)
+Direction _get_direction(Point * a, Point * b);
 
 #endif

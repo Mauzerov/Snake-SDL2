@@ -1,10 +1,10 @@
 #include "snake.h"
 #include "image.h"
+#include "config.h"
 
 #include <assert.h>
 
-//                              curr,         next
-Direction get_direction(Point * prev, Point * curr) {
+Direction _get_direction(Point * prev, Point * curr) {
     if (prev->x + 1 == curr->x && prev->y == curr->y)
         return Right;
 
@@ -22,37 +22,42 @@ Direction get_direction(Point * prev, Point * curr) {
 
 void render_snake(
     SDL_Renderer * renderer,
-    Snake * snake
+    Entity * snake,
+    size_t size,
+    Image * textures[Texture_COUNT]
 ) {
-    assert(snake->size >= 3 && "Snake has to have a body!");
+    assert(size >= 3 && "Snake has to have a body!");
 
-    size_t last = snake->size - 1;
+    size_t last = size - 1;
 
-    SDL_Rect rect = { snake->body[last].x * 32, snake->body[last].y * 32, 32, 32 };
+    SDL_Rect rect = {
+        snake[last].x * TILE_SIZE, snake[last].y * TILE_SIZE, 
+        TILE_SIZE, TILE_SIZE
+    };
 
     // Render Tail
     render_square_image(
         renderer,
-        snake->textures[SNAKE_TAIL],
-        &rect, 0,
-        get_direction(&snake->body[last], &snake->body[last - 1])
+        textures[Texture_TAIL],
+        &rect, last,
+        get_direction(&snake[last], &snake[last - 1])
     );
 
     // Render snake body
-    for (size_t i = 0; i < snake->size - 1; i++) {
-        Point * curr = &snake->body[i + 0];
-        rect.x = curr->x * 32, rect.y = curr->y * 32;
+    for (size_t i = 0; i <= last; i++) {
+        Entity * curr = &snake[i];
+
+        rect.x = curr->x * TILE_SIZE;
+        rect.y = curr->y * TILE_SIZE;
 
         for (int di = -1; di <= 1; di += 2) {
-            if (0 > i + di || i + di >= snake->size)
+            if (0 > (int)i + di || i + di >= size)
                 continue;
             render_square_image(
                 renderer,
-                snake->textures[
-                    (i == 0) ? SNAKE_HEAD : SNAKE_BODY
-                ],
+                textures[ (i == 0) ? Texture_HEAD : Texture_BODY ],
                 &rect, i,
-                get_direction(&snake->body[i + di], curr)
+                get_direction(&snake[i + di], curr)
             );
         }
     }
