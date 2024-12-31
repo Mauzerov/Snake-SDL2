@@ -5,50 +5,14 @@
 #include <assert.h>
 #include <math.h>
 
+#include "config.h"
 #include "image.h"
 #include "snake.h"
+#include "game.h"
 
 #include <SDL2/SDL.h>
 
-#define GAME_SIZE       16 // playable area size
-#define TILE_SIZE       32 // pixels
-#define CHAR_WIDTH      8  // pixels
-#define CHAR_HEIGHT     16 // pixels
-#define CHARMAP_SIZE    16 // number of characters per column/row in charmap.bmp
-#define CHARMAP_MASK    (CHARMAP_SIZE * CHARMAP_SIZE - 1)
-#define INFO_PANEL_ROWS 3
-#define INFO_PANEL_SIZE CHAR_HEIGHT * INFO_PANEL_ROWS
-#define GAME_WIDTH      (GAME_SIZE * TILE_SIZE)
-
-#define SAVE_FILE_NAME "snake_game.save"
-#define CONF_FILE_NAME "snake.config"
-
-#define SHORTEN_BY 2
-#define INITIAL_SNAKE_SIZE 5
-#define INITIAL_SNAKE_X    0
-#define INITIAL_SNAKE_Y    0
-
-#define FRAMES_PER_SECOND 5
-#define FRAMES_MAX_COUNT  100000
-
-#define APPLE_SCORE 2
-#define BERRY_SCORE 1
-
-#define APPLE_TIMER_WIDTH 16
-#define APPLE_TIMER_CAP   20 // seconds
-#define TIME_SCALE        .2
-#define SCALE_INTERVAL    60 // seconds
-#define ANIMATION_SIZE    2 // pixels (how much bigger)
-#define ANIMATION_LENGHT  ((ANIMATION_SIZE << 1) - 1)
-
-#define WINDOW_WIDTH    (GAME_WIDTH + APPLE_TIMER_WIDTH)
-#define WINDOW_HEIGHT   (GAME_WIDTH + INFO_PANEL_SIZE)
-
-#define PORTER_COUNT 2
-
 const unsigned long target_frame_duration = 1000 / FRAMES_PER_SECOND;
-
-Image * SNAKE_TEXTURES[SNAKE_TEXTURE_COUNT];
 
 /// colors from: https://flatuicolors.com/palette/se
 #define Color_SNAKE_TAIL (SDL_Color) { 11 , 232, 129, 0 }
@@ -63,38 +27,6 @@ Image * SNAKE_TEXTURES[SNAKE_TEXTURE_COUNT];
     time.tm_sec += seconds;         \
     mktime(&time);                  \
 } while ( 0 )
-
-// typedef struct {
-//     int x, y;
-// } Point;
-
-typedef struct Porter {
-    int x, y; // indirect inheritance (Point)
-    int identifier;
-    struct Porter * destination;
-} Porter;
-
-typedef struct {
-    int x, y; // indirect inheritance (Point)
-    int animation_frame;
-    SDL_Color color;
-} Entity;
-
-typedef struct Game {
-    Entity apple;
-    Entity berry;
-    Entity * snake;
-    int snake_size;
-    int apple_timer;
-    int score;
-    struct tm elapsed_time;
-    float time_scale;
-    int seed;
-    Porter porters[PORTER_COUNT * 2];
-    int dx, dy;
-    int ongoing;
-    void (*apple_actions[2])(struct Game*);
-} Game;
 
 #define _is_outofbounds(a) \
     ((a)->x < 0 || (a)->x >= GAME_SIZE || (a)->y < 0 || (a)->y >= GAME_SIZE)
