@@ -35,14 +35,6 @@ void render_snake(
         TILE_SIZE, TILE_SIZE
     };
 
-    // Render Tail
-    render_square_image(
-        renderer,
-        textures[Texture_TAIL],
-        &rect, last,
-        get_direction(&snake[last], &snake[last - 1])
-    );
-
     // Render snake body
     for (size_t i = 0; i <= last; i++) {
         Entity * curr = &snake[i];
@@ -55,7 +47,9 @@ void render_snake(
                 continue;
             render_square_image(
                 renderer,
-                textures[ (i == 0) ? Texture_HEAD : Texture_BODY ],
+                textures[
+                    (i == 0)    ? Texture_HEAD :
+                    (i == last) ? Texture_TAIL : Texture_BODY ],
                 &rect, i,
                 get_direction(&snake[i + di], curr)
             );
