@@ -15,31 +15,10 @@
 
 const unsigned long target_frame_duration = 1000 / FRAMES_PER_SECOND;
 
-/// colors from: https://flatuicolors.com/palette/se
-#define Color_SNAKE_TAIL (SDL_Color) { 11 , 232, 129, 0 }
-#define Color_SNAKE_HEAD (SDL_Color) { 5  , 196, 107, 0 }
-#define Color_APPLE      (SDL_Color) { 255, 63 , 52 , 0 }
-#define Color_BERRY      (SDL_Color) { 60 , 64 , 198, 0 }
-#define Color_BACKGROUND (SDL_Color) { 30 , 39 , 46 , 0 }
-#define Color_BLACK      (SDL_Color) { 0  , 0  , 0  , 0 }
-#define Color_FOREGROUND (SDL_Color) { 210, 218, 226, 0 }
-
 #define inctime(time, seconds) do { \
     time.tm_sec += seconds;         \
     mktime(&time);                  \
 } while ( 0 )
-
-#define _is_outofbounds(a) \
-    ((a)->x < 0 || (a)->x >= GAME_SIZE || (a)->y < 0 || (a)->y >= GAME_SIZE)
-#define is_outofbounds(a) _is_outofbounds((Point*)a)
-
-#define _is_overlapping(a, b) \
-    ((a)->x == (b)->x && (a)->y == (b)->y)
-#define is_overlapping(a, b) _is_overlapping((Point*)a, (Point*)b)
-
-int save_rand(Game * game) {
-    return game->seed = rand();
-}
 
 void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture) {
     entity->animation_frame = entity->animation_frame % ANIMATION_LENGHT;
@@ -60,7 +39,7 @@ void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture) {
     );
 }
 
-void draw_text(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
+void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_Color fg = Color_FOREGROUND;
     SDL_Color bg = Color_BLACK;
 
@@ -149,7 +128,7 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
 
     render_snake(renderer, game->snake, game->snake_size, game->textures);
 
-    draw_text(renderer, game, charmap);
+    render_game_info(renderer, game, charmap);
     
     SDL_RenderPresent(renderer);
 }
@@ -175,150 +154,6 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap) {
         0, GAME_WIDTH >> 1, CHAR_HEIGHT
     );
     SDL_RenderPresent(renderer);
-}
-
-void handle_outofbounds(Game * game) {
-    int *dx = &game->dx, *dy = &game->dy;
-    // undo move
-    game->snake[0].x -= *dx;
-    game->snake[0].y -= *dy;
-
-    if        (*dx == -1) { // moving left -> move up
-        *dy = *dx;
-        *dx = 0;
-    } else if (*dx == +1) { // moving right -> move down
-        *dy = *dx;
-        *dx = 0;
-    } else if (*dy == -1) { // moving up -> move right
-        *dx = -*dy;
-        *dy = 0;
-    } else if (*dy == +1) { // moving down -> move left
-        *dx = -*dy;
-        *dy = 0;
-    }
-
-    game->snake[0].x += *dx;
-    game->snake[0].y += *dy;
-
-    if (is_outofbounds(&game->snake[0])) {
-        // rotate movement
-        game->snake[0].x += (*dx *= -1) * 2;
-        game->snake[0].y += (*dy *= -1) * 2;
-    }
-}
-
-bool _random_position(Game * game, Point * entity) {
-    bool valid = false;
-    if (game->snake_size > GAME_SIZE * GAME_SIZE)
-        return valid;
-    do {
-        valid = true;
-        entity->x = save_rand(game) % GAME_SIZE;
-        entity->y = save_rand(game) % GAME_SIZE;
-
-        for (int i = 0; i < game->snake_size; i++) {
-            if (is_overlapping(&(game->snake[i]), entity)) {
-                valid = false;
-                break;
-            }
-        }
-
-        for (int i = 0; i < PORTER_COUNT * 2; i++) {
-            if ((Point *)&game->porters[i] != entity
-                    && is_overlapping(&game->snake[i], &game->porters[i])) {
-                valid = false;
-                break;
-            }
-        }
-    } while (!valid);
-    return valid;
-}
-
-#define random_position(game, object) _random_position(game, (Point*)object)
-
-void snake_init(Entity ** snake, int size) {
-    // if snake is not initilized
-    // then malloc it
-    // if snake is already initialized we can ignore it
-    //    due to the fact that next realloc call will truncate the size
-    if (*snake == NULL)
-        *snake = malloc(sizeof(Entity) * size);
-
-    for (int i = 0; i < size; i++) {
-        (*snake)[i].x = INITIAL_SNAKE_X + (size - i - 1);
-        (*snake)[i].y = INITIAL_SNAKE_Y;
-        (*snake)[i].color = Color_SNAKE_TAIL;
-    }
-    (*snake)[0].color = Color_SNAKE_HEAD;
-}
-
-#define save_file_operattion(file_fn, file, g, game) do {   \
-    file_fn(file, "%d %d\n", g->apple.x, g->apple.y);       \
-    file_fn(file, "%d %d\n", g->berry.x, g->berry.y);       \
-    file_fn(file, "%d\n", g->snake_size);                   \
-    /* note that in the for loop `game` is used */          \
-    for (int i = 0; i < game->snake_size; i++) {            \
-        file_fn(file, "%d %d\n",                            \
-            g->snake[i].x, g->snake[i].y);                  \
-    }                                                       \
-    file_fn(file, "%d %d %d %f\n",                          \
-        g->dx, g->dy,                                       \
-        g->apple_timer, g->time_scale);                     \
-    file_fn(file, "%d %d\n", g->score, g->seed);            \
-    file_fn(file, "%d %d\n",                                \
-        g->elapsed_time.tm_min,                             \
-        g->elapsed_time.tm_sec);                            \
-    for (int i = 0; i < PORTER_COUNT * 2; i++) {            \
-        file_fn(file, "%d %d %d\n",                         \
-            g->porters[i].x, g->porters[i].y,               \
-            g->porters[i].identifier);                      \
-    }                                                       \
-} while (0)
-
-void save_game(Game * game) {
-    FILE * file = fopen(SAVE_FILE_NAME, "w");
-    save_file_operattion(fprintf, file, game, game);
-    fclose(file);
-}
-
-void load_game(Game * game) {
-    FILE * file = fopen(SAVE_FILE_NAME, "r");
-    if (file == NULL) {
-        fprintf(stderr, SAVE_FILE_NAME " doesn't exist");
-        return;
-    }
-    save_file_operattion(fscanf, file, &game, game);
-    srand(game->seed);
-    fclose(file);
-}
-
-void porters_init(Game * game) {
-    for (int i = 0; i < PORTER_COUNT * 2; i += 2) {
-        game->porters[  i  ].destination = &game->porters[i + 1];
-        game->porters[i + 1].destination = &game->porters[  i  ];
-        game->porters[i].identifier = game->porters[i + 1].identifier = (i >> 1) + '1';
-
-        random_position(game, (Entity*)&game->porters[  i  ]);
-        random_position(game, (Entity*)&game->porters[i + 1]);
-    }
-}
-
-void new_game(Game * game) {
-    game->snake_size = INITIAL_SNAKE_SIZE;
-    game->dx = game->dy = 0;
-    game->elapsed_time = (struct tm) { 0 };
-    game->time_scale = 1.0;
-    game->ongoing = 1;
-    game->seed = time( NULL );
-    game->apple_timer = game->score = 0;
-
-    srand(game->seed);
-    
-    snake_init(&(game->snake), game->snake_size);   
-    porters_init(game);
-
-    game->apple.x = game->apple.y = -100;
-    random_position(game, &game->berry);
 }
 
 void snake_resize(Entity ** snake, int snake_size) {
@@ -500,45 +335,6 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     }
     return 0;
 }
-
-void load_game_textures(
-    SDL_Renderer * renderer,
-    Game * game,
-    SDL_Texture * texture
-) {
-    Image * tail = create_image(
-        renderer, texture,
-        (SDL_Rect) { 0, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * body = create_image(
-        renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 1, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * head = create_image(
-        renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 2, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * apple = create_image(
-        renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_APPLE
-    );
-    Image * berry = create_image(
-        renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_BERRY
-    );
-
-    game->textures[0] = tail;
-    game->textures[1] = body;
-    game->textures[2] = head;
-    game->textures[3] = apple;
-    game->textures[4] = berry;
-}
-
 
 int main() {
     // srand(time( NULL ));

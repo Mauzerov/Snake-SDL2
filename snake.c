@@ -56,3 +56,19 @@ void render_snake(
         }
     }
 }
+
+void snake_init(Entity ** snake, size_t size) {
+    // if snake is not initilized
+    // then malloc it
+    // if snake is already initialized we can ignore it
+    //    due to the fact that next realloc call will truncate the size
+    if (*snake == NULL)
+        *snake = malloc(sizeof(Entity) * size);
+
+    for (size_t i = 0; i < size; i++) {
+        (*snake)[i].x = INITIAL_SNAKE_X + (size - i - 1);
+        (*snake)[i].y = INITIAL_SNAKE_Y;
+        (*snake)[i].color = Color_SNAKE_TAIL;
+    }
+    (*snake)[0].color = Color_SNAKE_HEAD;
+}

@@ -5,6 +5,15 @@
 
 #include <SDL2/SDL.h>
 
+typedef enum {
+    Texture_TAIL = 0,
+    Texture_BODY,
+    Texture_HEAD,
+    Texture_APPLE,
+    Texture_BERRY,
+    Texture_COUNT,
+} SnakeTexture;
+
 typedef struct {
     int width, height;
     SDL_Texture * texture;

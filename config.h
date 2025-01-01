@@ -38,4 +38,13 @@
 
 #define PORTER_COUNT 2
 
+/// colors from: https://flatuicolors.com/palette/se
+#define Color_SNAKE_TAIL (SDL_Color) { 11 , 232, 129, 0 }
+#define Color_SNAKE_HEAD (SDL_Color) { 5  , 196, 107, 0 }
+#define Color_APPLE      (SDL_Color) { 255, 63 , 52 , 0 }
+#define Color_BERRY      (SDL_Color) { 60 , 64 , 198, 0 }
+#define Color_BACKGROUND (SDL_Color) { 30 , 39 , 46 , 0 }
+#define Color_BLACK      (SDL_Color) { 0  , 0  , 0  , 0 }
+#define Color_FOREGROUND (SDL_Color) { 210, 218, 226, 0 }
+
 #endif
