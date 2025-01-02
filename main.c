@@ -61,7 +61,7 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
     SDL_RenderText(
         renderer, charmap,
         string, fg,
-        GAME_WIDTH - sprintf(string, "Score: %04d", game->score) * CHAR_HEIGHT,
+        GAME_WIDTH - sprintf(string, "Score: %04lu", game->score) * CHAR_HEIGHT,
         GAME_WIDTH, CHAR_HEIGHT
     );
 

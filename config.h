@@ -13,8 +13,9 @@
 #define INFO_PANEL_SIZE CHAR_HEIGHT * INFO_PANEL_ROWS
 #define GAME_WIDTH      (GAME_SIZE * TILE_SIZE)
 
-#define SAVE_FILE_NAME "snake_game.save"
-#define CONF_FILE_NAME "snake.config"
+#define SAVE_FILE_NAME       "snake_game.save"
+#define CONF_FILE_NAME       "snake.config"
+#define LEADERBOARD_FILENAME "snake.score"
 
 #define SHORTEN_BY 2
 #define INITIAL_SNAKE_SIZE 5
@@ -23,6 +24,7 @@
 
 #define FRAMES_PER_SECOND 5
 #define FRAMES_MAX_COUNT  100000
+
 
 #define APPLE_SCORE 2
 #define BERRY_SCORE 1
@@ -40,6 +42,8 @@
 #define WINDOW_HEIGHT   (GAME_WIDTH + INFO_PANEL_SIZE)
 
 #define PORTER_COUNT 2
+#define MAX_NAME_SIZE 20
+#define LEADERBOARD_SIZE 3
 
 /// colors from: https://flatuicolors.com/palette/se
 #define Color_SNAKE_TAIL (SDL_Color) { 11 , 232, 129, 0 }
