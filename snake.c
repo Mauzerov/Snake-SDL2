@@ -23,12 +23,12 @@ Direction _get_direction(Point * prev, Point * curr) {
 void render_snake(
     SDL_Renderer * renderer,
     Entity * snake,
-    size_t size,
+    long size,
     Image * textures[Texture_COUNT]
 ) {
     assert(size >= 3 && "Snake has to have a body!");
 
-    size_t last = size - 1;
+    long last = size - 1;
 
     SDL_Rect rect = {
         snake[last].x * TILE_SIZE, snake[last].y * TILE_SIZE, 

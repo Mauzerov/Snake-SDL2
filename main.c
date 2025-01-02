@@ -298,6 +298,7 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
             switch (e.type) {
             case SDL_KEYDOWN:
                 handle_keyboard_event(&e.key, game);
+                break;
             default:
                 continue;
             }
@@ -307,26 +308,28 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
             if (game->ongoing == 0) {
                 game->ongoing = -1;
                 render_end_screen(renderer, charmap);
+                read_player_name(game);
             }
-        } else {
-            if (game->dx != 0 || game->dy != 0) {
-                snake_move(game);
-
-                // handle current play time
-                if (elapsed_frames++ % FRAMES_PER_SECOND == 0) {
-                    inctime(game->elapsed_time, 1);
-                }
-                // handle speed-up
-                if (elapsed_frames % (FRAMES_PER_SECOND * SCALE_INTERVAL) == 0) {
-                    game->time_scale += TIME_SCALE;
-                }
-
-                elapsed_frames = elapsed_frames % FRAMES_MAX_COUNT;
-            }
-
-            update_animations(game);
-            render_frame(renderer, game, charmap);
+            continue;
         }
+
+        if (game->dx != 0 || game->dy != 0) {
+            snake_move(game);
+
+            // handle current play time
+            if (elapsed_frames++ % FRAMES_PER_SECOND == 0) {
+                inctime(game->elapsed_time, 1);
+            }
+            // handle speed-up
+            if (elapsed_frames % (FRAMES_PER_SECOND * SCALE_INTERVAL) == 0) {
+                game->time_scale += TIME_SCALE;
+            }
+
+            elapsed_frames = elapsed_frames % FRAMES_MAX_COUNT;
+        }
+
+        update_animations(game);
+        render_frame(renderer, game, charmap);
 
         frame_duration = SDL_GetTicks() - frame_start;
         if (frame_duration * game->time_scale < target_frame_duration) {
@@ -337,7 +340,7 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
 }
 
 int main() {
-    // srand(time( NULL ));
+    srand(time( NULL ));
 
     SDL_Window * window     = NULL;
     SDL_Renderer * renderer = NULL;
