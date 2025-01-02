@@ -71,22 +71,21 @@ bool _random_position(Game * game, Point * entity);
     }                                                       \
 } while (0)
 
-extern void porters_init(Game * game);
+void porters_init(Game * game);
 
-extern void save_game(Game * game);
+void save_game(Game * game);
 
-extern void load_game(Game * game);
+void load_game(Game * game);
 
-extern void new_game(Game * game);
+void new_game(Game * game);
 
-extern void handle_outofbounds(Game * game);
+void handle_outofbounds(Game * game);
 
-extern void load_game_textures(
+void load_game_textures(
     SDL_Renderer * renderer,
     Game * game,
     SDL_Texture * texture
 );
-
 
 void render_leaderboard(Game *);
 
