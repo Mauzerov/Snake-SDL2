@@ -57,35 +57,30 @@ void load_game_textures(
     Game * game,
     SDL_Texture * texture
 ) {
-    Image * tail = create_image(
+    for (int i = Texture_TAIL; i <= Texture_HEAD; i++) {
+        game->textures[i] = create_image(
+            renderer, texture,
+            (SDL_Rect) {
+                TEXTURE_SIZE * i, 0,
+                TEXTURE_SIZE, TEXTURE_SIZE * SNAKE_ANIMATION_SIZE
+            },
+            Color_SNAKE_TAIL
+        );
+    }
+
+    SDL_Rect fruit_rect = {
+        TEXTURE_SIZE * Texture_APPLE, 0,
+        TEXTURE_SIZE, TEXTURE_SIZE * 2
+    };
+
+    game->textures[Texture_APPLE] = create_image(
         renderer, texture,
-        (SDL_Rect) { 0, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * body = create_image(
-        renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 1, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * head = create_image(
-        renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 2, 0, TILE_SIZE, TILE_SIZE * 2 },
-        Color_SNAKE_TAIL
-    );
-    Image * apple = create_image(
-        renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE * 2 },
+        fruit_rect,
         Color_APPLE
     );
-    Image * berry = create_image(
+    game->textures[Texture_BERRY] = create_image(
         renderer, texture,
-        (SDL_Rect) { TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE * 2 },
+        fruit_rect,
         Color_BERRY
     );
-
-    game->textures[0] = tail;
-    game->textures[1] = body;
-    game->textures[2] = head;
-    game->textures[3] = apple;
-    game->textures[4] = berry;
 }

@@ -4,6 +4,7 @@
 
 #define GAME_SIZE       16 // playable area size
 #define TILE_SIZE       32 // pixels
+#define TEXTURE_SIZE    32 // pixels
 #define CHAR_WIDTH      8  // pixels
 #define CHAR_HEIGHT     16 // pixels
 #define CHARMAP_SIZE    16 // number of characters per column/row in charmap.bmp
@@ -32,6 +33,8 @@
 #define SCALE_INTERVAL    60 // seconds
 #define ANIMATION_SIZE    2 // pixels (how much bigger)
 #define ANIMATION_LENGHT  ((ANIMATION_SIZE << 1) - 1)
+
+#define SNAKE_ANIMATION_SIZE    2 // pixels (how many rows of texture file to load)
 
 #define WINDOW_WIDTH    (GAME_WIDTH + APPLE_TIMER_WIDTH)
 #define WINDOW_HEIGHT   (GAME_WIDTH + INFO_PANEL_SIZE)

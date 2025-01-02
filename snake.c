@@ -36,14 +36,14 @@ void render_snake(
     };
 
     // Render snake body
-    for (size_t i = 0; i <= last; i++) {
+    for (long i = last; i >= 0; i--) {
         Entity * curr = &snake[i];
 
         rect.x = curr->x * TILE_SIZE;
         rect.y = curr->y * TILE_SIZE;
 
-        for (int di = -1; di <= 1; di += 2) {
-            if (0 > (int)i + di || i + di >= size)
+        for (long di = -1; di <= 1; di += 2) {
+            if (0 > i + di || i + di >= size)
                 continue;
             render_square_image(
                 renderer,

@@ -1,7 +1,6 @@
 #include <assert.h>
 
 #include "image.h"
-#include "snake.h"
 
 void render_square_image(
     SDL_Renderer * renderer,
