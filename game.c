@@ -38,10 +38,13 @@ void new_game(Game * game) {
     game->snake_size = INITIAL_SNAKE_SIZE;
     game->dx = game->dy = 0;
     game->elapsed_time = (struct tm) { 0 };
-    game->time_scale = 1.0;
-    game->ongoing = 1;
+    game->time_scale = INITIAL_TIME_SCALE;
+    game->ongoing = TRUE;
     game->seed = time( NULL );
+    game->text_entered = false;
     game->apple_timer = game->score = 0;
+
+    memset(game->buffer, 0, sizeof(game->buffer));
 
     srand(game->seed);
     
@@ -50,6 +53,7 @@ void new_game(Game * game) {
 
     game->apple.x = game->apple.y = -100;
     random_position(game, &game->berry);
+    game->records = read_leaderboard(game->leaderboard);
 }
 
 void load_game_textures(

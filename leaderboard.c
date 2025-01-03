@@ -1,11 +1,13 @@
 #include <string.h>
 
+
+#include <SDL2/SDL_log.h>
 #include "engine.h"
 #include "game.h"
 
 
 int order_players(const void * a, const void * b) {
-    return ((Player *)a)->score - ((Player *)b)->score;
+    return  ((Player *)b)->score - ((Player *)a)->score;
 }
 
 void write_leaderboard(Player leaderboard[LEADERBOARD_SIZE]) {
@@ -42,8 +44,18 @@ int read_leaderboard(Player leaderboard[LEADERBOARD_SIZE]) {
     return leaderboard_count;
 }
 
+bool can_add_to_leaderboard(Game * game) {
+    int records = read_leaderboard(game->leaderboard);
+    for (int i = 0; i < records; i++) {
+        if (game->leaderboard[i].score < game->score)
+            return true;
+    }
+    return false;
+}
+
 void add_player_to_leaderboard(
     const char * name,
+    size_t string_size,
     Game * game
 ) {
     // TODO: to allow continuous play change this to game->leaderboard
@@ -51,7 +63,7 @@ void add_player_to_leaderboard(
 
     // assume players are sorted from lowest to highest point
     for (i = 0; i < leaderboard_count; i++) {
-        if (game->score < game->leaderboard[i].score)
+        if (game->score > game->leaderboard[i].score)
             break; // insert player at (i)
     }
 
@@ -64,40 +76,9 @@ void add_player_to_leaderboard(
         sizeof (Player) * (LEADERBOARD_SIZE - i - 1)
     );
     // set leaderboard data
-    strcpy(game->leaderboard[i].name, name);
+    strncpy(game->leaderboard[i].name, name, string_size);
+    memset(game->leaderboard[i].name + string_size, 0, MAX_NAME_SIZE - string_size + 1);
     game->leaderboard[i].score = game->score;
 
     write_leaderboard(game->leaderboard);
-}
-
-void read_player_name(struct Game * game) {
-    char name[MAX_NAME_SIZE] = { 0 };
-    size_t string_size = 0;
-    bool name_entered = false;
-
-    SDL_Event e;
-
-    while (!name_entered) {
-        while (SDL_PollEvent(&e)) {
-            switch (e.type) {
-            case SDL_QUIT:
-                exit(0);
-            case SDL_KEYDOWN: {
-                int key = e.key.keysym.sym;
-
-                if (key == SDLK_RETURN) {
-                    name_entered = true;
-                } else if (key == SDLK_BACKSPACE && string_size > 0) {
-                    name[string_size--] = 0;
-                } else if (isprint(key)) {
-                    name[string_size++] = (char)key;
-                }
-            } break;
-            }
-        }
-    }
-    
-    if (strlen(name) > 0) {
-        add_player_to_leaderboard(name, game);
-    }
 }

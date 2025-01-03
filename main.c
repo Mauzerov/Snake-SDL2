@@ -133,26 +133,62 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     SDL_RenderPresent(renderer);
 }
 
-void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap) {
-    // TODO: implement leaderboard
-    static int line_num = 8;
+void render_leaderboard(
+    SDL_Renderer * renderer,
+    SDL_Texture * charmap,
+    Game * game,
+    int records,
+    int top_position
+) {
+    char buffer[MAX_NAME_SIZE * 2] = { 0 };
+    for (int i = 0; i < records; i++) {
+        sprintf(
+            buffer, "   %d. %-*s: %lu", i + 1,
+            MAX_NAME_SIZE,
+            game->leaderboard[i].name,
+            game->leaderboard[i].score
+        );
+        SDL_RenderText(
+            renderer, charmap, buffer, Color_FOREGROUND,
+            0, top_position + (8 + i) * CHAR_HEIGHT, CHAR_HEIGHT
+        );
+    }
+}
+
+void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * game) {
+    int records = game->records;
+    int line_num = 8 + records;
 
     SDL_Color bg = Color_BLACK;
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
+
+    int top_position = (GAME_WIDTH >> 1) - (line_num) * CHAR_HEIGHT;
     SDL_Rect rect = { 
-        0, (GAME_WIDTH >> 1) - (line_num >> 1) * CHAR_HEIGHT, 
+        0, top_position, 
         GAME_WIDTH, CHAR_HEIGHT * (2 + line_num)
     };
     SDL_RenderFillRect(renderer, &rect);
 
-    static char * string = 
-        "Press 'n' to start a new game!\n"
-        "Press 'ESC' to quit!"; 
+    char string[255] = { 0 };
+
+    sprintf(
+        string,
+        " Press 'n' to start a new game!\n"
+        "     Press 'ESC' to quit!    \n\n"
+        "        Your Score %04lu       \n"
+        "         Leaderboard:  \n\n\n\n\n"
+        " %s %s ",
+        game->score,
+        game->text_entered ? "" : "Your Name:",
+        game->text_entered ? "" : game->buffer
+    );
 
     SDL_RenderText(
         renderer, charmap, string, Color_FOREGROUND,
-        0, GAME_WIDTH >> 1, CHAR_HEIGHT
+        0, top_position + 2 * CHAR_HEIGHT, CHAR_HEIGHT
     );
+
+    render_leaderboard(renderer, charmap, game, records, top_position);
     SDL_RenderPresent(renderer);
 }
 
@@ -278,7 +314,20 @@ void handle_keyboard_event(SDL_KeyboardEvent * e, Game * game) {
     default:
         return;
     }
-    return;
+}
+
+void handle_text_input(SDL_KeyboardEvent * e, Game * game) {
+    int key = e->keysym.sym;
+    if (key == SDLK_RETURN) {
+        if (game->buffer_count > 0) {
+            add_player_to_leaderboard(game->buffer, game->buffer_count, game);
+        }   
+        game->text_entered = true;
+    } else if (key == SDLK_BACKSPACE && game->buffer_count > 0) {
+        game->buffer[--game->buffer_count] = '\0';
+    } else if (key >= 0 && key <= 255 && isprint(key) && game->buffer_count < MAX_NAME_SIZE) {
+        game->buffer[game->buffer_count++] = (char)key;
+    }
 }
 
 int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
@@ -297,19 +346,22 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
 
             switch (e.type) {
             case SDL_KEYDOWN:
-                handle_keyboard_event(&e.key, game);
+                if (game->ongoing == FINISHED && !game->text_entered)
+                    handle_text_input(&e.key, game);
+                else handle_keyboard_event(&e.key, game);
                 break;
             default:
                 continue;
             }
         }
 
-        if (game->ongoing <= 0) {
-            if (game->ongoing == 0) {
-                game->ongoing = -1;
-                render_end_screen(renderer, charmap);
-                read_player_name(game);
+        if (game->ongoing <= FINISHING) {
+            if (game->ongoing == FINISHING) {
+                game->ongoing = FINISHED;
+                game->text_entered = !can_add_to_leaderboard(game);
             }
+            render_end_screen(renderer, charmap, game);
+            SDL_Delay(100);
             continue;
         }
 

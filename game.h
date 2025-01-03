@@ -28,9 +28,13 @@ typedef struct Game {
     Porter porters[PORTER_COUNT * 2];
     int dx, dy;
     int ongoing;
+    char buffer[MAX_NAME_SIZE];
+    size_t buffer_count;
+    bool text_entered;
     void (*apple_actions[2])(struct Game*);
     Image * textures[Texture_COUNT];
     Player leaderboard[LEADERBOARD_SIZE];
+    int records;
 } Game;
 
 
@@ -87,9 +91,17 @@ void load_game_textures(
     SDL_Texture * texture
 );
 
-void render_leaderboard(Game *);
+bool can_add_to_leaderboard(Game *);
 
-void add_player_to_leaderboard(const char *, Game *);
+void render_leaderboard(
+    SDL_Renderer * renderer,
+    SDL_Texture * charmap,
+    Game * game,
+    int records,
+    int top_position
+);
+
+void add_player_to_leaderboard(const char *, size_t, Game *);
 
 void read_player_name(Game *);
 

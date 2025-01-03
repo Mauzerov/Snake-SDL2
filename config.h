@@ -24,6 +24,7 @@
 
 #define FRAMES_PER_SECOND 5
 #define FRAMES_MAX_COUNT  100000
+#define INITIAL_TIME_SCALE 1.0
 
 
 #define APPLE_SCORE 2
@@ -42,7 +43,7 @@
 #define WINDOW_HEIGHT   (GAME_WIDTH + INFO_PANEL_SIZE)
 
 #define PORTER_COUNT 2
-#define MAX_NAME_SIZE 20
+#define MAX_NAME_SIZE    20
 #define LEADERBOARD_SIZE 3
 
 /// colors from: https://flatuicolors.com/palette/se
@@ -53,5 +54,9 @@
 #define Color_BACKGROUND (SDL_Color) { 30 , 39 , 46 , 0 }
 #define Color_BLACK      (SDL_Color) { 0  , 0  , 0  , 0 }
 #define Color_FOREGROUND (SDL_Color) { 210, 218, 226, 0 }
+
+#define FINISHING 0
+#define FINISHED -1
+#define TRUE      1
 
 #endif
