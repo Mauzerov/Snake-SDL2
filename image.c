@@ -9,6 +9,8 @@ void render_square_image(
     int animation_frame,
     Direction direction
 ) {
+    if (direction == Unknown)
+        return;
     assert(image->height % image->width == 0 && "Image isn't a square nor a proper rectangle!");
 
     int frames = image->height / image->width;
@@ -18,8 +20,6 @@ void render_square_image(
         0, frame * image->width,
         image->width, image->width
     };
-    if (direction == Unknown)
-        return;
 
     SDL_RenderCopyEx(
         renderer,
