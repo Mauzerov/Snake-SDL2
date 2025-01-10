@@ -50,7 +50,7 @@ bool can_add_to_leaderboard(Game * game) {
         if (game->leaderboard[i].score < game->score)
             return true;
     }
-    return false;
+    return records != LEADERBOARD_SIZE;
 }
 
 void add_player_to_leaderboard(

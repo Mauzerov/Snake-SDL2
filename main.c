@@ -156,8 +156,7 @@ void render_leaderboard(
 }
 
 void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * game) {
-    int records = game->records;
-    int line_num = 8 + records;
+    int line_num = 8 + LEADERBOARD_SIZE;
 
     SDL_Color bg = Color_BLACK;
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
@@ -188,7 +187,7 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * ga
         0, top_position + 2 * CHAR_HEIGHT, CHAR_HEIGHT
     );
 
-    render_leaderboard(renderer, charmap, game, records, top_position);
+    render_leaderboard(renderer, charmap, game, game->records, top_position);
     SDL_RenderPresent(renderer);
 }
 
@@ -321,6 +320,8 @@ void handle_text_input(SDL_KeyboardEvent * e, Game * game) {
     if (key == SDLK_RETURN) {
         if (game->buffer_count > 0) {
             add_player_to_leaderboard(game->buffer, game->buffer_count, game);
+            game->records = read_leaderboard(game->leaderboard);
+            game->buffer[game->buffer_count = 0] = '\0';
         }   
         game->text_entered = true;
     } else if (key == SDLK_BACKSPACE && game->buffer_count > 0) {
