@@ -112,6 +112,23 @@ void snake_resize(Entity ** snake, int snake_size) {
     *snake = realloc(*snake, ((snake_size)) * sizeof(Entity));
 }
 
+void handle_collectibles(Game * game, Entity ** snake, int * snake_size) {
+    if (is_overlapping(*snake, &(game->apple))) {
+        int apple_action_index = save_rand(game) % 2;
+        game->score += APPLE_SCORE;
+        game->apple_actions[apple_action_index](game);
+        game->apple.x = game->apple.y = -100;
+        game->apple_timer = 0;
+    } else if (game->apple_timer == APPLE_TIMER_CAP * FRAMES_PER_SECOND) {
+        game->ongoing = random_position(game, &(game->apple));
+    }
+    if (is_overlapping(*snake, &(game->berry))) {
+        snake_resize(snake, *snake_size += 1);
+        game->score += BERRY_SCORE;
+        game->ongoing = random_position(game, &(game->berry));
+    }
+}
+
 void snake_move(Game * game) {
     assert((game->dx != 0 || game->dy != 0) && "snake_move should only be called when the snek can move");
 
@@ -126,29 +143,14 @@ void snake_move(Game * game) {
     }
 
     Entity * head = *snake;
+    
+    for (int i = 0; is_outofbounds2(head->x + game->dx, head->y + game->dy) && i < 4; i++) {
+        rotate90(&game->dx, &game->dy);
+    }
     int headx = head->x + game->dx;
     int heady = head->y + game->dy;
 
-    for (int i = 0; is_outofbounds2(headx, heady) && i < 4; i++) {
-        rotate90(&game->dx, &game->dy);
-        headx = head->x + game->dx;
-        heady = head->y + game->dy;
-    }
-
-    if (is_overlapping(head, &(game->apple))) {
-        int apple_action_index = save_rand(game) % 2;
-        game->score += APPLE_SCORE;
-        game->apple_actions[apple_action_index](game);
-        game->apple.x = game->apple.y = -100;
-        game->apple_timer = 0;
-    } else if (game->apple_timer == APPLE_TIMER_CAP * FRAMES_PER_SECOND) {
-        game->ongoing = random_position(game, &(game->apple));
-    }
-    if (is_overlapping(head, &(game->berry))) {
-        snake_resize(snake, *snake_size += 1);
-        game->score += BERRY_SCORE;
-        game->ongoing = random_position(game, &(game->berry));
-    }
+    handle_collectibles(game, snake, snake_size);
 
     memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
 
