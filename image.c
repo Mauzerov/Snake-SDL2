@@ -113,3 +113,10 @@ Image * create_image(
 
     return image;
 }
+
+void destroy_image(Image * image) {
+    if (image != NULL) {
+        SDL_DestroyTexture(image->texture);
+        free(image);
+    }
+}

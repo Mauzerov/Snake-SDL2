@@ -376,6 +376,8 @@ int main() {
 
     int exit_code = main_loop(renderer, &game, charmap);
 
+    destroy_game_textures(&game);
+
     SDL_DestroyTexture(charmap);
     
     SDL_DestroyWindow(window);

@@ -88,3 +88,8 @@ void load_game_textures(
         Color_BERRY
     );
 }
+
+void destroy_game_textures(Game * game) {
+    for (int i = Texture_TAIL; i < Texture_COUNT; i++)
+        destroy_image(game->textures[i]);
+}

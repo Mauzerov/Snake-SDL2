@@ -39,4 +39,6 @@ Image * create_image(
     SDL_Color color          // color to map white to
 );
 
+void destroy_image(Image * image);
+
 #endif

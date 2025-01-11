@@ -93,6 +93,8 @@ void load_game_textures(
     SDL_Texture * texture
 );
 
+void destroy_game_textures(Game * game);
+
 bool can_add_to_leaderboard(Game *);
 
 void render_leaderboard(
