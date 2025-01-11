@@ -52,6 +52,8 @@ bool _random_position(Game * game, Point * entity);
 
 #define random_position(game, object) _random_position(game, (Point*)object)
 
+#define random_chance(game, chance) ((float)(save_rand(game) % 10000) / 100.f <= (float)chance)
+
 #define save_file_operattion(file_fn, file, g, game) do {   \
     file_fn(file, "%d %d\n", g->apple.x, g->apple.y);       \
     file_fn(file, "%d %d\n", g->berry.x, g->berry.y);       \

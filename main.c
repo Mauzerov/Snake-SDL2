@@ -97,7 +97,7 @@ void draw_apple_timer(SDL_Renderer * renderer, Game * game) {
     );
 
     if (game->dx || game->dy)
-        game->apple_timer++;
+        game->apple_timer--;
 
     SDL_RenderFillRect(renderer, &rect);
 }

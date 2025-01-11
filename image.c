@@ -2,6 +2,22 @@
 
 #include "image.h"
 
+Direction _get_direction(Point * prev, Point * curr) {
+    if (prev->x + 1 == curr->x && prev->y == curr->y)
+        return Right;
+
+    if (prev->x - 1 == curr->x && prev->y == curr->y)
+        return Left;
+
+    if (prev->y - 1 == curr->y && prev->x == curr->x)
+        return Up;
+
+    if (prev->y + 1 == curr->y && prev->x == curr->x)
+        return Down;
+
+    return Unknown;
+}
+
 void render_square_image(
     SDL_Renderer * renderer,
     Image * image,

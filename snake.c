@@ -4,22 +4,6 @@
 
 #include <assert.h>
 
-Direction _get_direction(Point * prev, Point * curr) {
-    if (prev->x + 1 == curr->x && prev->y == curr->y)
-        return Right;
-
-    if (prev->x - 1 == curr->x && prev->y == curr->y)
-        return Left;
-
-    if (prev->y - 1 == curr->y && prev->x == curr->x)
-        return Up;
-
-    if (prev->y + 1 == curr->y && prev->x == curr->x)
-        return Down;
-
-    return Unknown;
-}
-
 void render_snake(
     SDL_Renderer * renderer,
     Entity * snake,
@@ -73,41 +57,6 @@ void rotate90(int * dx, int * dy) {
     *dx = -*dy, *dy = tmp;
 }
 
-void handle_outofbounds(Game * game) {
-    int *dx = &game->dx, *dy = &game->dy, _dx = *dx;
-    // undo move
-    game->snake[0].x -= *dx;
-    game->snake[0].y -= *dy;
-
-    fprintf(stderr, "from %d %d\n", *dx, *dy);
-    *dx = -*dy, *dy = _dx;
-    fprintf(stderr, "into %d %d\n", *dx, *dy);
-
-
-    // if        (*dx == -1) { // moving left -> move up
-    //     *dy = *dx;
-    //     *dx = 0;
-    // } else if (*dx == +1) { // moving right -> move down
-    //     *dy = *dx;
-    //     *dx = 0;
-    // } else if (*dy == -1) { // moving up -> move right
-    //     *dx = -*dy;
-    //     *dy = 0;
-    // } else if (*dy == +1) { // moving down -> move left
-    //     *dx = -*dy;
-    //     *dy = 0;
-    // }
-
-    game->snake[0].x += *dx;
-    game->snake[0].y += *dy;
-
-    if (is_outofbounds(&game->snake[0])) {
-        // rotate movement
-        game->snake[0].x += (*dx *= -1) * 2;
-        game->snake[0].y += (*dy *= -1) * 2;
-    }
-}
-
 void snake_resize(Entity ** snake, int snake_size) {
     *snake = realloc(*snake, ((snake_size)) * sizeof(Entity));
 }
@@ -117,9 +66,12 @@ void handle_collectibles(Game * game, Entity ** snake, int * snake_size) {
         int apple_action_index = save_rand(game) % 2;
         game->score += APPLE_SCORE;
         game->apple_actions[apple_action_index](game);
-        game->apple.x = game->apple.y = -100;
         game->apple_timer = 0;
-    } else if (game->apple_timer == APPLE_TIMER_CAP * FRAMES_PER_SECOND) {
+        game->apple.x = game->apple.y = -100;
+    } else if (game->apple_timer == 0) {
+        game->apple.x = game->apple.y = -100;
+    } else if (random_chance(game, 10)) {
+        game->apple_timer = APPLE_TIMER_CAP * FRAMES_PER_SECOND;
         game->ongoing = random_position(game, &(game->apple));
     }
     if (is_overlapping(*snake, &(game->berry))) {
@@ -137,18 +89,17 @@ void snake_move(Game * game) {
 
     for (int i = 1; i < *snake_size; i++) {
         if (is_overlapping(*snake, &(*snake)[i])) {
-            game->ongoing = 0;
+            game->ongoing = FINISHING;
             return;
         }
     }
 
     Entity * head = *snake;
-    
     for (int i = 0; is_outofbounds2(head->x + game->dx, head->y + game->dy) && i < 4; i++) {
         rotate90(&game->dx, &game->dy);
     }
-    int headx = head->x + game->dx;
-    int heady = head->y + game->dy;
+    int headx = head->x + game->dx,
+        heady = head->y + game->dy;
 
     handle_collectibles(game, snake, snake_size);
 
