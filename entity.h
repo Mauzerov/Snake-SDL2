@@ -10,7 +10,6 @@ typedef struct Porter {
 typedef struct {
     int x, y; // indirect inheritance (Point)
     int animation_frame;
-    SDL_Color color;
 } Entity;
 
 #endif

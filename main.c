@@ -77,7 +77,7 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
 }
 
 void draw_apple_timer(SDL_Renderer * renderer, Game * game) {
-    SDL_Color color = game->apple.color;
+    SDL_Color color = Color_APPLE;
     SDL_Color bg = Color_BLACK;
 
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
@@ -399,8 +399,8 @@ int main() {
     SDL_Renderer * renderer = NULL;
     
     Game game = (Game) {
-        .apple = (Entity) { 0, .color = Color_APPLE },
-        .berry = (Entity) { 0, .color = Color_BERRY },
+        .apple = (Entity) { 0 },
+        .berry = (Entity) { 0 },
         .apple_actions = { apple_action_shorten, apple_action_slowdown },
     };
     new_game(&game);
