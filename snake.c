@@ -109,14 +109,16 @@ void snake_move(Game * game) {
     for (int i = 0; is_outofbounds2(head->x + game->dx, head->y + game->dy) && i < 4; i++) {
         rotate90(&game->dx, &game->dy);
     }
-    int headx = head->x + game->dx,
-        heady = head->y + game->dy;
-    Entity new_head = (Entity) { headx, heady, ANIMATION_SIZE };
+    Entity new_head = (Entity) {
+        head->x + game->dx,
+        head->y + game->dy,
+        ANIMATION_SIZE
+    };
 
     handle_collectibles(game, snake, snake_size);
 
     memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
     memcpy((*snake), &new_head, sizeof(Entity));
-    
+
     handle_porters(game, snake);
 }
