@@ -33,34 +33,3 @@ bool _random_position(Game * game, Point * entity) {
     } while (!valid);
     return valid;
 }
-
-
-void handle_outofbounds(Game * game) {
-    int *dx = &game->dx, *dy = &game->dy;
-    // undo move
-    game->snake[0].x -= *dx;
-    game->snake[0].y -= *dy;
-
-    if        (*dx == -1) { // moving left -> move up
-        *dy = *dx;
-        *dx = 0;
-    } else if (*dx == +1) { // moving right -> move down
-        *dy = *dx;
-        *dx = 0;
-    } else if (*dy == -1) { // moving up -> move right
-        *dx = -*dy;
-        *dy = 0;
-    } else if (*dy == +1) { // moving down -> move left
-        *dx = -*dy;
-        *dy = 0;
-    }
-
-    game->snake[0].x += *dx;
-    game->snake[0].y += *dy;
-
-    if (is_outofbounds(&game->snake[0])) {
-        // rotate movement
-        game->snake[0].x += (*dx *= -1) * 2;
-        game->snake[0].y += (*dy *= -1) * 2;
-    }
-}

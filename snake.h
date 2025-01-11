@@ -5,6 +5,7 @@
 #include "image.h"
 #include "point.h"
 #include "entity.h"
+#include "game.h"
 
 void render_snake(
     SDL_Renderer * renderer,
@@ -14,5 +15,9 @@ void render_snake(
 );
 
 void snake_init(Entity ** snake, size_t size);
+
+void snake_resize(Entity ** snake, int snake_size);
+
+void snake_move(Game * game);
 
 #endif

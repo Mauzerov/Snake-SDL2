@@ -37,10 +37,10 @@ typedef struct Game {
     int records;
 } Game;
 
-
-#define _is_outofbounds(a) \
-    ((a)->x < 0 || (a)->x >= GAME_SIZE || (a)->y < 0 || (a)->y >= GAME_SIZE)
-#define is_outofbounds(a) _is_outofbounds((Point*)a)
+#define _is_outofbounds(x, y) \
+    ((x) < 0 || x >= GAME_SIZE || (y) < 0 || (y) >= GAME_SIZE)
+#define is_outofbounds(a) _is_outofbounds((a)->x, (a)->y)
+#define is_outofbounds2(x, y) _is_outofbounds(x, y)
 
 #define _is_overlapping(a, b) \
     ((a)->x == (b)->x && (a)->y == (b)->y)

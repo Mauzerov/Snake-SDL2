@@ -191,63 +191,6 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * ga
     SDL_RenderPresent(renderer);
 }
 
-void snake_resize(Entity ** snake, int snake_size) {
-    *snake = realloc(*snake, ((snake_size)) * sizeof(Entity));
-}
-
-void snake_move(Game * game) {
-    int dx = game->dx, dy = game->dy;
-    assert((dx != 0 || dy != 0) && "snake_move should only be called when the snek can move");
-
-    int * snake_size = &(game->snake_size);
-    Entity ** snake = &(game->snake);
-
-    for (int i = 1; i < *snake_size; i++) {
-        if (is_overlapping(*snake, &(*snake)[i])) {
-            game->ongoing = 0;
-            return;
-        }
-    }
-
-    Entity * head = *snake;
-    int headx = head->x + dx;
-    int heady = head->y + dy;
-    head->color = Color_SNAKE_TAIL; // reset head color
-
-
-    if (is_overlapping(*snake, &(game->apple))) {
-        int apple_action_index = save_rand(game) % 2;
-        game->score += APPLE_SCORE;
-        game->apple_actions[apple_action_index](game);
-        game->apple.x = game->apple.y = -100;
-        game->apple_timer = 0;
-    } else if (game->apple_timer == APPLE_TIMER_CAP * FRAMES_PER_SECOND) {
-        game->ongoing = random_position(game, &(game->apple));
-    }
-    if (is_overlapping(*snake, &(game->berry))) {
-        snake_resize(snake, *snake_size += 1);
-        game->score += BERRY_SCORE;
-        game->ongoing = random_position(game, &(game->berry));
-    }
-
-    memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
-
-    (*snake)[0] = (Entity) { headx, heady, ANIMATION_SIZE, Color_SNAKE_HEAD };
-
-    for (int i = 0; i < PORTER_COUNT * 2; i++) {
-        if (is_overlapping(*snake, &game->porters[i])) {
-            Porter * porter = &game->porters[i];
-            (*snake)[0].x = porter->destination->x;
-            (*snake)[0].y = porter->destination->y;
-            break;
-        }
-    }
-
-    if (is_outofbounds(&(*snake)[0])) {
-        handle_outofbounds(game);
-    }
-}
-
 void apple_action_shorten(Game * game) {
     game->snake_size -= SHORTEN_BY;
     if (game->snake_size < INITIAL_SNAKE_SIZE)
