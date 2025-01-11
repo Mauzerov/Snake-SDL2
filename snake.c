@@ -85,8 +85,8 @@ void handle_porters(Game * game, Entity ** snake) {
     for (int i = 0; i < PORTER_COUNT * 2; i++) {
         if (is_overlapping(*snake, &game->porters[i])) {
             Porter * porter = &game->porters[i];
-            (*snake)[0].x = porter->destination->x;
-            (*snake)[0].y = porter->destination->y;
+            (*snake)->x = porter->destination->x;
+            (*snake)->y = porter->destination->y;
             break;
         }
     }
@@ -111,11 +111,12 @@ void snake_move(Game * game) {
     }
     int headx = head->x + game->dx,
         heady = head->y + game->dy;
+    Entity new_head = (Entity) { headx, heady, ANIMATION_SIZE };
 
-    handle_porters(game, snake);
     handle_collectibles(game, snake, snake_size);
 
     memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
-
-    (*snake)[0] = (Entity) { headx, heady, ANIMATION_SIZE };
+    memcpy((*snake), &new_head, sizeof(Entity));
+    
+    handle_porters(game, snake);
 }
