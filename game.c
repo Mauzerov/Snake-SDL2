@@ -87,6 +87,17 @@ void load_game_textures(
         fruit_rect,
         Color_BERRY
     );
+    
+    game->textures[Texture_PORTER] = create_image(
+        renderer, texture,
+        (SDL_Rect) {
+            TEXTURE_SIZE * Texture_HEAD,
+            TEXTURE_SIZE,
+            TEXTURE_SIZE,
+            TEXTURE_SIZE
+        },
+        Color_PORTER
+    );
 }
 
 void destroy_game_textures(Game * game) {

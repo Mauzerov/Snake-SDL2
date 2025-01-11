@@ -102,13 +102,35 @@ void draw_apple_timer(SDL_Renderer * renderer, Game * game) {
     SDL_RenderFillRect(renderer, &rect);
 }
 
-void draw_porter(SDL_Renderer * renderer, SDL_Texture * charmap, Porter * porter) {
+void draw_porter(
+    SDL_Renderer * renderer,
+    SDL_Texture * charmap,
+    Game * game,
+    Porter * porter
+) {
     SDL_Color fg = Color_FOREGROUND;
     char string[2] = { (char)porter->identifier, 0 };
+
+    SDL_Rect rect = (SDL_Rect) {
+        porter->x * TILE_SIZE,
+        porter->y * TILE_SIZE,
+        TILE_SIZE,
+        TILE_SIZE
+    };
+
+    render_square_image(
+        renderer,
+        game->textures[Texture_PORTER],
+        &rect, 0, 0
+    );
+
+    int index = (TILE_SIZE >> 1);
     SDL_RenderText(
         renderer, charmap, 
         string, fg,
-        porter->x * TILE_SIZE, porter->y * TILE_SIZE, TILE_SIZE
+        rect.x + (TILE_SIZE - index),
+        rect.y + (TILE_SIZE - index),
+        index
     );
 }
 
@@ -120,7 +142,7 @@ void render_frame(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     draw_apple_timer(renderer, game);
 
     for (int i = 0; i < PORTER_COUNT * 2; i++) {
-        draw_porter(renderer, charmap, &game->porters[i]);
+        draw_porter(renderer, charmap, game, &game->porters[i]);
     }
 
     draw_entity(renderer, &(game->apple), game->textures[Texture_APPLE]);

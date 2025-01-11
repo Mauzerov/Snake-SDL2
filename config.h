@@ -51,14 +51,18 @@
 #define MAX_NAME_SIZE    20
 #define LEADERBOARD_SIZE 3
 
+#define rgb(r, g, b) r, g, b
+#define rgba(r, g, b, a) r, g, b, (int)(a * 255)
+
 /// colors from: https://flatuicolors.com/palette/se
-#define Color_SNAKE_TAIL (SDL_Color) { 11 , 232, 129, 0 }
-#define Color_SNAKE_HEAD (SDL_Color) { 5  , 196, 107, 0 }
-#define Color_APPLE      (SDL_Color) { 255, 63 , 52 , 0 }
-#define Color_BERRY      (SDL_Color) { 60 , 64 , 198, 0 }
-#define Color_BACKGROUND (SDL_Color) { 30 , 39 , 46 , 0 }
-#define Color_BLACK      (SDL_Color) { 0  , 0  , 0  , 0 }
-#define Color_FOREGROUND (SDL_Color) { 210, 218, 226, 0 }
+#define Color_SNAKE_TAIL (SDL_Color) { rgb(11 , 232, 129), 255 }
+#define Color_SNAKE_HEAD (SDL_Color) { rgb(5  , 196, 107), 255 }
+#define Color_APPLE      (SDL_Color) { rgb(255, 63 , 52 ), 255 }
+#define Color_BERRY      (SDL_Color) { rgb(60 , 64 , 198), 255 }
+#define Color_BACKGROUND (SDL_Color) { rgb(30 , 39 , 46 ), 255 }
+#define Color_BLACK      (SDL_Color) { rgb(0  , 0  , 0  ), 255 }
+#define Color_FOREGROUND (SDL_Color) { rgb(210, 218, 226), 255 }
+#define Color_PORTER     (SDL_Color) { rgb(239,  87, 119), 255 }
 
 #define FINISHING 0
 #define FINISHED -1

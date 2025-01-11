@@ -11,6 +11,7 @@ typedef enum {
     Texture_HEAD,
     Texture_APPLE,
     Texture_BERRY,
+    Texture_PORTER,
     Texture_COUNT,
 } SnakeTexture;
 
