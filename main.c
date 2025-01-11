@@ -55,14 +55,18 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
     SDL_RenderText(
         renderer, charmap,
         string, fg,
-        0, GAME_WIDTH, CHAR_HEIGHT
+        0, GAME_WIDTH, INFO_CHAR_SIZE
     );
-
+    
     SDL_RenderText(
         renderer, charmap,
         string, fg,
-        GAME_WIDTH - sprintf(string, "Score: %04lu", game->score) * CHAR_HEIGHT,
-        GAME_WIDTH, CHAR_HEIGHT
+        GAME_WIDTH - (sprintf(
+            string,
+            "Score: %04lu\nSpeed: %.2f",
+            game->score, game->time_scale
+        ) * INFO_CHAR_SIZE >> 1),
+        GAME_WIDTH, INFO_CHAR_SIZE
     );
 
     sprintf(string,
@@ -72,7 +76,7 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
     SDL_RenderText(
         renderer, charmap,
         string, fg,
-        0, GAME_WIDTH + CHAR_HEIGHT, CHAR_HEIGHT
+        0, GAME_WIDTH + INFO_CHAR_SIZE, INFO_CHAR_SIZE
     );
 }
 
@@ -173,7 +177,7 @@ void render_leaderboard(
         char * centered_string = center_string(buffer, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
         SDL_RenderText(
             renderer, charmap, centered_string, Color_FOREGROUND,
-            0, top_position + (8 + i) * CHAR_HEIGHT, CHAR_HEIGHT
+            0, top_position + (8 + i) * INFO_CHAR_SIZE, INFO_CHAR_SIZE
         );
         free(centered_string);
     }
@@ -185,10 +189,10 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * ga
     SDL_Color bg = Color_BLACK;
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
 
-    int top_position = (GAME_WIDTH >> 1) - (line_num) * CHAR_HEIGHT;
+    int top_position = (GAME_WIDTH >> 1) - (line_num) * INFO_CHAR_SIZE;
     SDL_Rect rect = { 
         0, top_position, 
-        GAME_WIDTH, CHAR_HEIGHT * (2 + line_num)
+        GAME_WIDTH, INFO_CHAR_SIZE * (2 + line_num)
     };
     SDL_RenderFillRect(renderer, &rect);
 
@@ -211,7 +215,7 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * ga
 
     SDL_RenderText(
         renderer, charmap, centered_string, Color_FOREGROUND,
-        0, top_position + 2 * CHAR_HEIGHT, CHAR_HEIGHT
+        0, top_position + 2 * INFO_CHAR_SIZE, INFO_CHAR_SIZE
     );
     free(centered_string);
 
@@ -228,6 +232,8 @@ void apple_action_shorten(Game * game) {
 
 void apple_action_slowdown(Game * game) {
     game->time_scale -= TIME_SCALE / 2.;
+    if (game->time_scale < INITIAL_TIME_SCALE)
+        game->time_scale = INITIAL_TIME_SCALE;
 }
 
 void update_animations(Game * game) {

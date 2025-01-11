@@ -6,11 +6,11 @@
 #define TILE_SIZE       32 // pixels
 #define TEXTURE_SIZE    32 // pixels
 #define CHAR_WIDTH      8  // pixels
-#define CHAR_HEIGHT     16 // pixels
+#define INFO_CHAR_SIZE  (TILE_SIZE >> 1)
 #define CHARMAP_SIZE    16 // number of characters per column/row in charmap.bmp
 #define CHARMAP_MASK    (CHARMAP_SIZE * CHARMAP_SIZE - 1)
 #define INFO_PANEL_ROWS 3
-#define INFO_PANEL_SIZE CHAR_HEIGHT * INFO_PANEL_ROWS
+#define INFO_PANEL_SIZE INFO_CHAR_SIZE * INFO_PANEL_ROWS
 #define GAME_WIDTH      (GAME_SIZE * TILE_SIZE)
 
 #define MAX_STRING_BUFFER_SIZE 1024
@@ -29,6 +29,7 @@
 #define FRAMES_PER_SECOND 5
 #define FRAMES_MAX_COUNT  100000
 #define INITIAL_TIME_SCALE 1.0
+#define TIME_SCALE         1.2
 
 
 #define APPLE_SCORE 2
@@ -37,8 +38,7 @@
 #define APPLE_TIMER_WIDTH 16
 #define APPLE_TIMER_CAP   20 // seconds
 #define APPLE_SHOW_CHANCE 1 // percent
-#define TIME_SCALE        .2
-#define SCALE_INTERVAL    60 // seconds
+#define SCALE_INTERVAL    10 // seconds
 #define ANIMATION_SIZE    2 // pixels (how much bigger)
 #define ANIMATION_LENGHT  ((ANIMATION_SIZE << 1) - 1)
 
