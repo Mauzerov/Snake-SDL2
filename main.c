@@ -140,18 +140,20 @@ void render_leaderboard(
     int records,
     int top_position
 ) {
-    char buffer[MAX_NAME_SIZE * 2] = { 0 };
+    char buffer[MAX_STRING_BUFFER_SIZE] = { 0 };
     for (int i = 0; i < records; i++) {
         sprintf(
-            buffer, "   %d. %-*s: %lu", i + 1,
+            buffer, "%d. %-*s: %4lu", i + 1,
             MAX_NAME_SIZE,
             game->leaderboard[i].name,
             game->leaderboard[i].score
         );
+        char * centered_string = center_string(buffer, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
         SDL_RenderText(
-            renderer, charmap, buffer, Color_FOREGROUND,
+            renderer, charmap, centered_string, Color_FOREGROUND,
             0, top_position + (8 + i) * CHAR_HEIGHT, CHAR_HEIGHT
         );
+        free(centered_string);
     }
 }
 
@@ -168,24 +170,28 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * ga
     };
     SDL_RenderFillRect(renderer, &rect);
 
-    char string[255] = { 0 };
+    char string[MAX_STRING_BUFFER_SIZE] = { 0 };
 
     sprintf(
         string,
-        " Press 'n' to start a new game!\n"
-        "     Press 'ESC' to quit!    \n\n"
-        "        Your Score %04lu       \n"
-        "         Leaderboard:  \n\n\n\n\n"
-        " %s %s ",
+        "Press 'n' to start a new game!\n"
+        "Press 'ESC' to quit!\n\n"
+        "Your Score %04lu\n"
+        "Leaderboard:\n\n\n\n\n"
+        "%s %-*s",
         game->score,
         game->text_entered ? "" : "Your Name:",
+        MAX_NAME_SIZE,
         game->text_entered ? "" : game->buffer
     );
 
+    char * centered_string = center_string(string, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
+
     SDL_RenderText(
-        renderer, charmap, string, Color_FOREGROUND,
+        renderer, charmap, centered_string, Color_FOREGROUND,
         0, top_position + 2 * CHAR_HEIGHT, CHAR_HEIGHT
     );
+    free(centered_string);
 
     render_leaderboard(renderer, charmap, game, game->records, top_position);
     SDL_RenderPresent(renderer);

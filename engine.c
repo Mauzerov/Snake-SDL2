@@ -2,7 +2,7 @@
 #include "config.h"
 #include "image.h"
 
-int SDL_RenderText(
+void SDL_RenderText(
     SDL_Renderer * renderer,
     SDL_Texture * charmap,
     const char * string,
@@ -28,5 +28,33 @@ int SDL_RenderText(
         SDL_RenderCopy(renderer, charmap, &src_rect, &dst_rect);
         dst_rect.x += CHAR_WIDTH * scale;
     }
-    return 0;
+}
+
+char * center_string(const char *input, int width) {
+    char *output = (char *)calloc(MAX_STRING_BUFFER_SIZE, sizeof(char));
+    char *output_ptr = output;
+
+    for (
+        const char *line_start = input, *line_end = NULL;
+        *line_start != '\0';
+        line_start = line_end + 1
+    ) {
+        line_end = strchr(line_start, '\n');
+        if (!line_end) {
+            line_end = line_start + strlen(line_start);
+        }
+
+        int line_length = line_end - line_start;
+
+        int formatted_size = sprintf(
+            output_ptr,
+            "%*s%.*s\n",
+            (width - line_length) >> 1, "",
+            line_length,
+            line_start
+        );
+        output_ptr += formatted_size;
+    }
+
+    return output;
 }

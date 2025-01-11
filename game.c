@@ -51,7 +51,7 @@ void new_game(Game * game) {
     snake_init(&(game->snake), game->snake_size);   
     porters_init(game);
 
-    game->apple.x = game->apple.y = -100;
+    game->apple.x = game->apple.y = UNDEFINED_POS;
     random_position(game, &game->berry);
     game->records = read_leaderboard(game->leaderboard);
 }

@@ -13,14 +13,18 @@
 #define INFO_PANEL_SIZE CHAR_HEIGHT * INFO_PANEL_ROWS
 #define GAME_WIDTH      (GAME_SIZE * TILE_SIZE)
 
+#define MAX_STRING_BUFFER_SIZE 1024
+
 #define SAVE_FILE_NAME       "snake_game.save"
 #define CONF_FILE_NAME       "snake.config"
 #define LEADERBOARD_FILENAME "snake.score"
 
-#define SHORTEN_BY 2
+#define SHORTEN_BY 4
 #define INITIAL_SNAKE_SIZE 5
 #define INITIAL_SNAKE_X    0
 #define INITIAL_SNAKE_Y    0
+
+#define UNDEFINED_POS -100
 
 #define FRAMES_PER_SECOND 5
 #define FRAMES_MAX_COUNT  100000
@@ -32,6 +36,7 @@
 
 #define APPLE_TIMER_WIDTH 16
 #define APPLE_TIMER_CAP   20 // seconds
+#define APPLE_SHOW_CHANCE 1 // percent
 #define TIME_SCALE        .2
 #define SCALE_INTERVAL    60 // seconds
 #define ANIMATION_SIZE    2 // pixels (how much bigger)

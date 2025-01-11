@@ -32,7 +32,7 @@ int read_leaderboard(Player leaderboard[LEADERBOARD_SIZE]) {
         return 0;
 
     int leaderboard_count = 0;
-    while (fscanf(file, "%lu %19[^\n]",
+    while (fscanf(file, "%lu %" STR(MAX_NAME_SIZE) "[^\n]",
         &leaderboard[leaderboard_count].score,
         leaderboard [leaderboard_count].name
     ) == 2 && leaderboard_count < LEADERBOARD_SIZE)

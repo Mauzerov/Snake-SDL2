@@ -11,7 +11,7 @@
 #include <SDL2/SDL_events.h>
 
 typedef struct {
-    char name[MAX_NAME_SIZE];
+    char name[MAX_NAME_SIZE + 1];
     unsigned long score;
 } Player;
 
@@ -28,7 +28,7 @@ typedef struct Game {
     Porter porters[PORTER_COUNT * 2];
     int dx, dy;
     int ongoing;
-    char buffer[MAX_NAME_SIZE];
+    char buffer[MAX_NAME_SIZE + 1];
     size_t buffer_count;
     bool text_entered;
     void (*apple_actions[2])(struct Game*);
