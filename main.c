@@ -262,6 +262,7 @@ void handle_text_input(SDL_KeyboardEvent * e, Game * game) {
     int key = e->keysym.sym;
     if (key == SDLK_ESCAPE) {
         game->buffer[game->buffer_count = 0] = '\0';
+        game->text_entered = true;
     } else if (key == SDLK_RETURN) {
         if (game->buffer_count > 0) {
             add_player_to_leaderboard(game->buffer, game->buffer_count, game);
