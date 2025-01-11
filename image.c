@@ -32,7 +32,7 @@ void render_square_image(
     );  
 }
 
-SDL_Texture * remove_backgroud(
+SDL_Texture * create_transparent_texture(
     SDL_Renderer * renderer,
     SDL_Surface * surface
 ) {
@@ -52,11 +52,7 @@ SDL_Texture * remove_backgroud(
     return texture;
 }
 
-SDL_Texture * create_texture(
-    SDL_Renderer * renderer,
-    char * path
-) {
-
+SDL_Texture * create_texture(SDL_Renderer * renderer, char * path) {
     SDL_Surface * surface = SDL_LoadBMP(path);
 
     if (surface == NULL) {
@@ -64,7 +60,7 @@ SDL_Texture * create_texture(
         exit(EXIT_FAILURE);
     }
 
-    SDL_Texture * texture = remove_backgroud(renderer, surface);
+    SDL_Texture * texture = create_transparent_texture(renderer, surface);
 
     SDL_FreeSurface(surface);
 
@@ -90,11 +86,11 @@ Image * create_image(
     SDL_RenderFillRect     (renderer, NULL);
     // Copy selected part onto a new texture with colors.
     SDL_SetTextureColorMod (texture, color.r, color.g, color.b);
-    SDL_RenderCopy(renderer, texture, &rect, NULL);
+    SDL_RenderCopy         (renderer, texture, &rect, NULL);
 
-    Image * image = malloc(sizeof(Image));
-    image->width = rect.w;
-    image->height = rect.h;
+    Image * image  = malloc(sizeof(Image));
+    image->width   = rect.w;
+    image->height  = rect.h;
     image->texture = part_texture;
     // Reset Render Target
     SDL_SetRenderTarget(renderer, NULL);
