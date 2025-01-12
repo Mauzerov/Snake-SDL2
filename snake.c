@@ -57,39 +57,45 @@ void rotate90(int * dx, int * dy) {
     *dx = -*dy, *dy = tmp;
 }
 
+#define rotate180(dx, dy) do {  \
+    rotate90(dx, dy);           \
+    rotate90(dx, dy);           \
+} while (0)
+
 void snake_resize(Entity ** snake, int snake_size) {
     *snake = realloc(*snake, ((snake_size)) * sizeof(Entity));
 }
 
-void handle_collectibles(Game * game, Entity * head, Entity ** snake, int * snake_size) {
-    if (is_overlapping(head, &(game->apple))) {
+void handle_collectibles(Game * game, Entity ** snake, int * snake_size) {
+    if (is_overlapping(*snake, &(game->apple))) {
         int apple_action_index = save_rand(game) % 2;
         game->score += APPLE_SCORE;
         game->apple_actions[apple_action_index](game);
         game->apple_timer = 0;
         game->apple.x = game->apple.y = UNDEFINED_POS;
-    } else if (game->apple_timer <= -1 && game->apple.y != UNDEFINED_POS) {
+    } else if (game->apple_timer <= 0 && game->apple.y != UNDEFINED_POS) {
         game->apple.x = game->apple.y = UNDEFINED_POS;
     } else if (game->apple.y == UNDEFINED_POS && random_chance(game, APPLE_SHOW_CHANCE)) {
         game->apple_timer = APPLE_TIMER_CAP * FRAMES_PER_SECOND;
         game->ongoing = random_position(game, &(game->apple));
     }
-    if (is_overlapping(head, &(game->berry))) {
+    if (is_overlapping(*snake, &(game->berry))) {
         snake_resize(snake, *snake_size += 1);
         game->score += BERRY_SCORE;
         game->ongoing = random_position(game, &(game->berry));
     }
 }
 
-void handle_porters(Game * game, Entity ** snake) {
+bool handle_porters(Game * game, Entity ** snake) {
     for (int i = 0; i < PORTER_COUNT * 2; i++) {
         if (is_overlapping(*snake, &game->porters[i])) {
             Porter * porter = &game->porters[i];
             (*snake)->x = porter->destination->x;
             (*snake)->y = porter->destination->y;
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 bool is_snake_overlaping(Entity * snake, int headx, int heady, int snake_size) {
@@ -107,8 +113,8 @@ void snake_move(Game * game) {
 
     int * snake_size = &(game->snake_size);
     Entity ** snake = &(game->snake);
-
     Entity * head = *snake;
+
     if (is_snake_overlaping(*snake, head->x, head->y, *snake_size)) {
         game->ongoing = FINISHING;
         return;
@@ -116,10 +122,9 @@ void snake_move(Game * game) {
 
     if (is_outofbounds2(head->x + game->dx, head->y + game->dy))
         rotate90(&game->dx, &game->dy);
-    if (is_outofbounds2(head->x + game->dx, head->y + game->dy)) {
-        rotate90(&game->dx, &game->dy);
-        rotate90(&game->dx, &game->dy);
-    }
+    // if snake is still out of bounds
+    if (is_outofbounds2(head->x + game->dx, head->y + game->dy))
+        rotate180(&game->dx, &game->dy);
 
     Entity new_head = (Entity) {
         head->x + game->dx,
@@ -127,7 +132,7 @@ void snake_move(Game * game) {
         ANIMATION_SIZE
     };
 
-    handle_collectibles(game, &new_head, snake, snake_size);
+    handle_collectibles(game, snake, snake_size);
 
     memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
     memcpy((*snake), &new_head, sizeof(Entity));
