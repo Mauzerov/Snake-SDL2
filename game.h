@@ -22,7 +22,7 @@ typedef struct Game {
     int snake_size;
     int apple_timer;
     unsigned long score;
-    struct tm elapsed_time;
+    float elapsed_time;
     float time_scale;
     int seed;
     Porter porters[PORTER_COUNT * 2];
@@ -67,9 +67,8 @@ bool _random_position(Game * game, Point * entity);
         g->dx, g->dy,                                       \
         g->apple_timer, g->time_scale);                     \
     file_fn(file, "%lu %d\n", g->score, g->seed);           \
-    file_fn(file, "%d %d\n",                                \
-        g->elapsed_time.tm_min,                             \
-        g->elapsed_time.tm_sec);                            \
+    file_fn(file, "%f\n",                                   \
+        g->elapsed_time);                                   \
     for (int i = 0; i < PORTER_COUNT * 2; i++) {            \
         file_fn(file, "%d %d %d\n",                         \
             g->porters[i].x, g->porters[i].y,               \

@@ -13,16 +13,7 @@
 
 #include <SDL2/SDL.h>
 
-const unsigned long target_frame_duration = 1000 / FRAMES_PER_SECOND;
-
-#define inctime(time, seconds) do { \
-    time.tm_sec += seconds;         \
-    mktime(&time);                  \
-} while ( 0 )
-
 void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture) {
-    entity->animation_frame = entity->animation_frame % ANIMATION_LENGHT;
-
     SDL_Rect fill_rect = (SDL_Rect) {
         entity->x * TILE_SIZE,
         entity->y * TILE_SIZE,
@@ -49,8 +40,13 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
 
     static char string[64] = { 0 };
 
+    struct tm elapsed_time = (struct tm) {
+        .tm_sec = game->elapsed_time
+    };
+    mktime(&elapsed_time);
+
     strftime(string, sizeof(string),
-        "Elapsed Time: %M:%S", &game->elapsed_time
+        "Elapsed Time: %M:%S", &elapsed_time
     );
     SDL_RenderText(
         renderer, charmap,
@@ -311,30 +307,35 @@ void handle_text_input(SDL_KeyboardEvent * e, Game * game) {
     }
 }
 
-int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
+void handle_events(Game * game) {
     static SDL_Event e;
+    while (SDL_PollEvent(&e)) {
+        if (e.type == SDL_QUIT)
+            exit(EXIT_SUCCESS);
 
-    unsigned long frame_start, frame_duration;
+        switch (e.type) {
+        case SDL_KEYDOWN:
+            if (game->ongoing == FINISHED && !game->text_entered)
+                handle_text_input(&e.key, game);
+            else handle_keyboard_event(&e.key, game);
+            break;
+        default:
+            continue;
+        }
+    }
+}
+
+int main_loop(
+    SDL_Renderer * renderer,
+    Game * game,
+    SDL_Texture * charmap
+) {
+    const float delta_time = 1.f / (float)REFRESH_RATE;
     unsigned elapsed_frames = 0;
+    float cooldown = 0.f;
 
     while (1) {
-        frame_start = SDL_GetTicks();
-
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
-                return 0;
-            }
-
-            switch (e.type) {
-            case SDL_KEYDOWN:
-                if (game->ongoing == FINISHED && !game->text_entered)
-                    handle_text_input(&e.key, game);
-                else handle_keyboard_event(&e.key, game);
-                break;
-            default:
-                continue;
-            }
-        }
+        handle_events(game);
 
         if (game->ongoing <= FINISHING) {
             if (game->ongoing == FINISHING) {
@@ -342,34 +343,33 @@ int main_loop(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
                 game->text_entered = !can_add_to_leaderboard(game);
             }
             render_end_screen(renderer, charmap, game);
-            SDL_Delay(100);
+            SDL_Delay(LAZY_DELAY);
             continue;
         }
 
-        if (game->dx != 0 || game->dy != 0) {
+        bool game_running = (game->dx != 0 || game->dy != 0);
+        bool should_update = cooldown < 0.f;
+
+        if (game_running && should_update) {
             snake_move(game);
-
-            // handle current play time
-            if (elapsed_frames++ % FRAMES_PER_SECOND == 0) {
-                inctime(game->elapsed_time, 1);
-            }
-            // handle speed-up
-            if (elapsed_frames % (FRAMES_PER_SECOND * SCALE_INTERVAL) == 0) {
-                game->time_scale += TIME_SCALE;
-            }
-
-            elapsed_frames = elapsed_frames % FRAMES_MAX_COUNT;
+            cooldown = 1.f / (FRAMES_PER_SECOND * game->time_scale);
+        } else if (game_running) {
+            cooldown -= delta_time;
         }
 
-        update_animations(game);
+        if (elapsed_frames % (int)(REFRESH_RATE * ANIMATION_INTERVAL) == 0) {
+            update_animations(game);
+        }
+        
+        if (elapsed_frames % (int)(REFRESH_RATE * SCALE_INTERVAL) == 0) {
+            game->time_scale += TIME_SCALE;
+        }
+
         render_frame(renderer, game, charmap);
-
-        frame_duration = SDL_GetTicks() - frame_start;
-        if (frame_duration * game->time_scale < target_frame_duration) {
-            SDL_Delay(target_frame_duration - frame_duration * game->time_scale);
-        }
+        game->elapsed_time += delta_time;
+        elapsed_frames = (elapsed_frames + 1) % FRAMES_MAX_COUNT;
+        SDL_Delay((int)(1000 * delta_time));
     }
-    return 0;
 }
 
 int main() {

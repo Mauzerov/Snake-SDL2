@@ -93,7 +93,8 @@ void handle_porters(Game * game, Entity ** snake) {
 }
 
 void snake_move(Game * game) {
-    assert((game->dx != 0 || game->dy != 0) && "snake_move should only be called when the snek can move");
+    if (!(game->dx != 0 || game->dy != 0) && "snake_move should only be called when the snek can move")
+        return;
 
     int * snake_size = &(game->snake_size);
     Entity ** snake = &(game->snake);

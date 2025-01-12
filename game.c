@@ -37,7 +37,7 @@ void porters_init(Game * game) {
 void new_game(Game * game) {
     game->snake_size = INITIAL_SNAKE_SIZE;
     game->dx = game->dy = 0;
-    game->elapsed_time = (struct tm) { 0 };
+    game->elapsed_time = 0.f;
     game->time_scale = INITIAL_TIME_SCALE;
     game->ongoing = TRUE;
     game->seed = time( NULL );
@@ -87,7 +87,7 @@ void load_game_textures(
         fruit_rect,
         Color_BERRY
     );
-    
+
     game->textures[Texture_PORTER] = create_image(
         renderer, texture,
         (SDL_Rect) {

@@ -26,8 +26,11 @@
 
 #define UNDEFINED_POS -100
 
+#define REFRESH_RATE 60
+#define LAZY_DELAY 100 // ms
 #define FRAMES_PER_SECOND 5
 #define FRAMES_MAX_COUNT  100000
+#define SCALE_INTERVAL     10 // seconds
 #define INITIAL_TIME_SCALE 1.0
 #define TIME_SCALE         1.2
 
@@ -38,9 +41,8 @@
 #define APPLE_TIMER_WIDTH 16
 #define APPLE_TIMER_CAP   20 // seconds
 #define APPLE_SHOW_CHANCE 1 // percent
-#define SCALE_INTERVAL    10 // seconds
 #define ANIMATION_SIZE    2 // pixels (how much bigger)
-#define ANIMATION_LENGHT  ((ANIMATION_SIZE << 1) - 1)
+#define ANIMATION_INTERVAL .5 // seconds
 
 #define SNAKE_ANIMATION_SIZE    2 // pixels (how many rows of texture file to load)
 
