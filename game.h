@@ -114,4 +114,10 @@ void write_leaderboard(Player[LEADERBOARD_SIZE]);
 
 int order_players(const void *, const void *);
 
+void render_game(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap);
+
+void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap);
+
+void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * game);
+
 #endif

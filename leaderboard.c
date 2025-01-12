@@ -2,7 +2,7 @@
 
 
 #include <SDL2/SDL_log.h>
-#include "engine.h"
+#include "renderer.h"
 #include "game.h"
 
 
@@ -81,4 +81,68 @@ void add_player_to_leaderboard(
     game->leaderboard[i].score = game->score;
 
     write_leaderboard(game->leaderboard);
+}
+
+void render_leaderboard(
+    SDL_Renderer * renderer,
+    SDL_Texture * charmap,
+    Game * game,
+    int records,
+    int top_position
+) {
+    char buffer[MAX_STRING_BUFFER_SIZE] = { 0 };
+    for (int i = 0; i < records; i++) {
+        sprintf(
+            buffer, "%d. %-*s: %4lu", i + 1,
+            MAX_NAME_SIZE,
+            game->leaderboard[i].name,
+            game->leaderboard[i].score
+        );
+        char * centered_string = center_string(buffer, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
+        SDL_RenderText(
+            renderer, charmap, centered_string, Color_FOREGROUND,
+            0, top_position + (8 + i) * INFO_CHAR_SIZE, INFO_CHAR_SIZE
+        );
+        free(centered_string);
+    }
+}
+
+void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * game) {
+    int line_num = 8 + LEADERBOARD_SIZE;
+
+    SDL_Color bg = Color_BLACK;
+    SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
+
+    int top_position = (GAME_WIDTH >> 1) - (line_num) * INFO_CHAR_SIZE;
+    SDL_Rect rect = { 
+        0, top_position, 
+        GAME_WIDTH, INFO_CHAR_SIZE * (2 + line_num)
+    };
+    SDL_RenderFillRect(renderer, &rect);
+
+    char string[MAX_STRING_BUFFER_SIZE] = { 0 };
+
+    sprintf(
+        string,
+        "Press 'n' to start a new game!\n"
+        "Press 'ESC' to quit!\n\n"
+        "Your Score %04lu\n"
+        "Leaderboard:\n\n\n\n\n"
+        "%s %-*s",
+        game->score,
+        game->text_entered ? "" : "Your Name:",
+        MAX_NAME_SIZE,
+        game->text_entered ? "" : game->buffer
+    );
+
+    char * centered_string = center_string(string, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
+
+    SDL_RenderText(
+        renderer, charmap, centered_string, Color_FOREGROUND,
+        0, top_position + 2 * INFO_CHAR_SIZE, INFO_CHAR_SIZE
+    );
+    free(centered_string);
+
+    render_leaderboard(renderer, charmap, game, game->records, top_position);
+    SDL_RenderPresent(renderer);
 }

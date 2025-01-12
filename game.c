@@ -4,6 +4,7 @@
 #include "game.h"
 #include "snake.h"
 #include "image.h"
+#include "renderer.h"
 
 
 void save_game(Game * game) {
@@ -103,4 +104,73 @@ void load_game_textures(
 void destroy_game_textures(Game * game) {
     for (int i = Texture_TAIL; i < Texture_COUNT; i++)
         destroy_image(game->textures[i]);
+}
+
+
+void render_game(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
+    SDL_Color bg = Color_BACKGROUND;
+
+    SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
+    SDL_RenderClear(renderer);
+    draw_apple_timer(renderer, game);
+
+    for (int i = 0; i < PORTER_COUNT * 2; i++) {
+        draw_porter(renderer, charmap, game, &game->porters[i]);
+    }
+
+    draw_entity(renderer, &(game->apple), game->textures[Texture_APPLE]);
+    draw_entity(renderer, &(game->berry), game->textures[Texture_BERRY]);
+
+    render_snake(renderer, game->snake, game->snake_size, game->textures);
+
+    render_game_info(renderer, game, charmap);
+    
+    SDL_RenderPresent(renderer);
+}
+
+
+void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
+    SDL_Color fg = Color_FOREGROUND;
+    SDL_Color bg = Color_BLACK;
+
+    SDL_Rect bg_rect = (SDL_Rect) { 0, GAME_WIDTH, WINDOW_WIDTH, INFO_PANEL_SIZE };
+    SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
+    SDL_RenderFillRect(renderer, &bg_rect);
+
+    static char string[64] = { 0 };
+
+    struct tm elapsed_time = (struct tm) {
+        .tm_sec = game->elapsed_time
+    };
+    mktime(&elapsed_time);
+
+    strftime(string, sizeof(string),
+        "Elapsed Time: %M:%S", &elapsed_time
+    );
+    SDL_RenderText(
+        renderer, charmap,
+        string, fg,
+        0, GAME_WIDTH, INFO_CHAR_SIZE
+    );
+    
+    SDL_RenderText(
+        renderer, charmap,
+        string, fg,
+        GAME_WIDTH - (sprintf(
+            string,
+            "Score: %04lu\nSpeed: %.2f",
+            game->score, game->time_scale
+        ) * INFO_CHAR_SIZE >> 1),
+        GAME_WIDTH, INFO_CHAR_SIZE
+    );
+
+    sprintf(string,
+        "Mandatory: 1,2,3,4\n"
+        "Optional:  A,B,C,D,E,F,G,H"
+    );
+    SDL_RenderText(
+        renderer, charmap,
+        string, fg,
+        0, GAME_WIDTH + INFO_CHAR_SIZE, INFO_CHAR_SIZE
+    );
 }

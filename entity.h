@@ -1,6 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "image.h"
+
 typedef struct Porter {
     int x, y; // indirect inheritance (Point)
     int identifier;
@@ -11,5 +13,18 @@ typedef struct {
     int x, y; // indirect inheritance (Point)
     int animation_frame;
 } Entity;
+
+typedef struct Game Game;
+
+void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture);
+
+void draw_porter(
+    SDL_Renderer * renderer,
+    SDL_Texture * charmap,
+    Game * game,
+    Porter * porter
+);
+
+void draw_apple_timer(SDL_Renderer * renderer, Game * game);
 
 #endif
