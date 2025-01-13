@@ -72,8 +72,5 @@ void draw_apple_timer(SDL_Renderer * renderer, Game * game) {
         (APPLE_TIMER_CAP * FRAMES_PER_SECOND) / (float)game->apple_timer
     );
 
-    if (game->dx || game->dy)
-        game->apple_timer--;
-
     SDL_RenderFillRect(renderer, &rect);
 }

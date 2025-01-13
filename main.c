@@ -119,11 +119,24 @@ void handle_events(Game * game) {
     }
 }
 
+void handle_updates(Game * game, float dt) {
+    if (!game->dx && !game->dy)
+        return;
+    // TODO: move every timed updqde here
+    //     : use the -= dt < 0 approach
+    //     : reset timers here too
+    //     : snake_move should also be called here
+    //     : experiment with += for reset instead of just assignent (should prevent desync from real time)
+    game->apple_timer -= dt;
+    game->elapsed_time += dt;
+}
+
 int main_loop(
     SDL_Renderer * renderer,
     Game * game,
     SDL_Texture * charmap
 ) {
+    // TODO: use actual time difference and not a const one
     const float delta_time = 1.f / (float)REFRESH_RATE;
     unsigned elapsed_frames = 0;
     float cooldown = 0.f;
@@ -160,7 +173,8 @@ int main_loop(
         }
 
         render_game(renderer, game, charmap);
-        game->elapsed_time += delta_time;
+        handle_updates(game, delta_time);
+        
         elapsed_frames = (elapsed_frames + 1) % FRAMES_MAX_COUNT;
         SDL_Delay((int)(1000 * delta_time));
     }
