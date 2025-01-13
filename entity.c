@@ -69,7 +69,7 @@ void draw_apple_timer(SDL_Renderer * renderer, Game * game) {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 
     rect.h = GAME_WIDTH / (
-        (APPLE_TIMER_CAP * FRAMES_PER_SECOND) / (float)game->apple_timer
+        (APPLE_TIMER_CAP) / game->apple_cooldown
     );
 
     SDL_RenderFillRect(renderer, &rect);

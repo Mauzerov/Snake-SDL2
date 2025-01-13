@@ -20,10 +20,13 @@ typedef struct Game {
     Entity berry;
     Entity * snake;
     int snake_size;
-    int apple_timer;
+    float apple_cooldown,
+          elapsed_time,
+          move_cooldown,
+          animation_cooldown,
+          speedup_cooldown,
+          game_speed_scale;
     unsigned long score;
-    float elapsed_time;
-    float time_scale;
     int seed;
     Porter porters[PORTER_COUNT * 2];
     int dx, dy;
@@ -63,9 +66,13 @@ bool _random_position(Game * game, Point * entity);
         file_fn(file, "%d %d\n",                            \
             g->snake[i].x, g->snake[i].y);                  \
     }                                                       \
-    file_fn(file, "%d %d %d %f\n",                          \
+    file_fn(file, "%d %d %f %f %f %f\n",                    \
         g->dx, g->dy,                                       \
-        g->apple_timer, g->time_scale);                     \
+        g->apple_cooldown,                                  \
+        g->move_cooldown,                                   \
+        g->animation_cooldown,                              \
+        g->game_speed_scale                                 \
+    );                                                      \
     file_fn(file, "%lu %d\n", g->score, g->seed);           \
     file_fn(file, "%f\n",                                   \
         g->elapsed_time);                                   \

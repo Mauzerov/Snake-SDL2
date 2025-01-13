@@ -39,11 +39,11 @@ void new_game(Game * game) {
     game->snake_size = INITIAL_SNAKE_SIZE;
     game->dx = game->dy = 0;
     game->elapsed_time = 0.f;
-    game->time_scale = INITIAL_TIME_SCALE;
+    game->game_speed_scale = INITIAL_TIME_SCALE;
     game->ongoing = TRUE;
     game->seed = time( NULL );
     game->text_entered = false;
-    game->apple_timer = game->score = 0;
+    game->apple_cooldown = game->score = 0;
 
     memset(game->buffer, 0, sizeof(game->buffer));
 
@@ -159,7 +159,7 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
         GAME_WIDTH - (sprintf(
             string,
             "Score: %04lu\nSpeed: %.2f",
-            game->score, game->time_scale
+            game->score, game->game_speed_scale
         ) * INFO_CHAR_SIZE >> 1),
         GAME_WIDTH, INFO_CHAR_SIZE
     );

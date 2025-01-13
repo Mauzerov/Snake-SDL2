@@ -21,9 +21,9 @@ void apple_action_shorten(Game * game) {
 }
 
 void apple_action_slowdown(Game * game) {
-    game->time_scale -= TIME_SCALE / 2.;
-    if (game->time_scale < INITIAL_TIME_SCALE)
-        game->time_scale = INITIAL_TIME_SCALE;
+    game->game_speed_scale -= TIME_SCALE / 2.;
+    if (game->game_speed_scale < INITIAL_TIME_SCALE)
+        game->game_speed_scale = INITIAL_TIME_SCALE;
 }
 
 void update_animations(Game * game) {
@@ -119,16 +119,45 @@ void handle_events(Game * game) {
     }
 }
 
-void handle_updates(Game * game, float dt) {
+#define handle_cooldown(cooldown, _default, dt, code_block) do { \
+    if ((cooldown) < 0.f) {     \
+        code_block;             \
+        cooldown += _default;   \
+    } else cooldown -= dt;      \
+} while (0)
+
+void handle_updates(Game * game, float delta_time) {
     if (!game->dx && !game->dy)
         return;
-    // TODO: move every timed updqde here
-    //     : use the -= dt < 0 approach
-    //     : reset timers here too
-    //     : snake_move should also be called here
-    //     : experiment with += for reset instead of just assignent (should prevent desync from real time)
-    game->apple_timer -= dt;
-    game->elapsed_time += dt;
+    game->elapsed_time += delta_time;
+
+    handle_cooldown(
+        game->apple_cooldown,
+        0,
+        delta_time,
+        game->apple.x = game->apple.y = UNDEFINED_POS
+    );
+
+    handle_cooldown(
+        game->move_cooldown,
+        1.f / (FRAMES_PER_SECOND * game->game_speed_scale),
+        delta_time,
+        snake_move(game)
+    );
+
+    handle_cooldown(
+        game->animation_cooldown,
+        ANIMATION_INTERVAL,
+        delta_time,
+        update_animations(game)
+    );
+
+    handle_cooldown(
+        game->speedup_cooldown,
+        SCALE_INTERVAL,
+        delta_time,
+        game->game_speed_scale += TIME_SCALE
+    );
 }
 
 int main_loop(
@@ -139,7 +168,6 @@ int main_loop(
     // TODO: use actual time difference and not a const one
     const float delta_time = 1.f / (float)REFRESH_RATE;
     unsigned elapsed_frames = 0;
-    float cooldown = 0.f;
 
     while (1) {
         handle_events(game);
@@ -152,24 +180,6 @@ int main_loop(
             render_end_screen(renderer, charmap, game);
             SDL_Delay(LAZY_DELAY);
             continue;
-        }
-
-        bool game_running = (game->dx != 0 || game->dy != 0);
-        bool should_update = cooldown < 0.f;
-
-        if (game_running && should_update) {
-            snake_move(game);
-            cooldown = 1.f / (FRAMES_PER_SECOND * game->time_scale);
-        } else if (game_running) {
-            cooldown -= delta_time;
-        }
-
-        if (elapsed_frames % (int)(REFRESH_RATE * ANIMATION_INTERVAL) == 0) {
-            update_animations(game);
-        }
-
-        if (elapsed_frames % (int)(REFRESH_RATE * SCALE_INTERVAL) == 0) {
-            game->time_scale += TIME_SCALE;
         }
 
         render_game(renderer, game, charmap);

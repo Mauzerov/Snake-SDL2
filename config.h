@@ -39,7 +39,7 @@
 #define BERRY_SCORE 1
 
 #define APPLE_TIMER_WIDTH 16
-#define APPLE_TIMER_CAP   40 // seconds
+#define APPLE_TIMER_CAP   10 // seconds
 #define APPLE_SHOW_CHANCE 1 // percent
 #define ANIMATION_SIZE    2 // pixels (how much bigger)
 #define ANIMATION_INTERVAL .5 // seconds
