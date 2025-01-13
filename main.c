@@ -167,7 +167,6 @@ int main_loop(
 ) {
     // TODO: use actual time difference and not a const one
     const float delta_time = 1.f / (float)REFRESH_RATE;
-    unsigned elapsed_frames = 0;
 
     while (1) {
         handle_events(game);
@@ -185,7 +184,6 @@ int main_loop(
         render_game(renderer, game, charmap);
         handle_updates(game, delta_time);
         
-        elapsed_frames = (elapsed_frames + 1) % FRAMES_MAX_COUNT;
         SDL_Delay((int)(1000 * delta_time));
     }
 }
