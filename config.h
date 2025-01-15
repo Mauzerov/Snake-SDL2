@@ -39,7 +39,7 @@
 #define FRAMES_MAX_COUNT  100000
 
 // SPEED UP
-#define SCALE_INTERVAL     10 // seconds
+#define SPEED_SCALE_INTERVAL     10 // seconds
 #define INITIAL_TIME_SCALE 1.0
 #define TIME_SCALE_CHANGE  0.2
 
@@ -55,9 +55,7 @@
 #define APPLE_SLOWDOWN_BY (TIME_SCALE_CHANGE / 2)
 
 // ANIMATED OBJECTS
-#define ANIMATION_SIZE    2 // pixels (how much bigger)
 #define ANIMATION_INTERVAL .5 // seconds
-#define SNAKE_ANIMATION_SIZE 2 // pixels (how many rows of texture file to load)
 
 #define MAX_NAME_SIZE    20
 #define LEADERBOARD_SIZE 3

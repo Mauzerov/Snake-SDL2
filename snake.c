@@ -126,7 +126,6 @@ void snake_move(Game * game) {
     Entity new_head = (Entity) {
         head->x + game->dx,
         head->y + game->dy,
-        ANIMATION_SIZE
     };
 
     handle_collectibles(game, snake, snake_size);

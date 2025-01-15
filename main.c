@@ -153,7 +153,7 @@ void handle_updates(Game * game, float delta_time) {
 
     handle_cooldown(
         game->speedup_cooldown,
-        SCALE_INTERVAL,
+        SPEED_SCALE_INTERVAL,
         delta_time,
         game->game_speed_scale += TIME_SCALE_CHANGE
     );
