@@ -72,7 +72,6 @@ void handle_collectibles(Game * game, Entity ** snake, int * snake_size) {
         game->score += APPLE_SCORE;
         game->apple_actions[apple_action_index](game);
         game->apple_cooldown = 0;
-        game->apple.x = game->apple.y = UNDEFINED_POS;
     } else if (game->apple.y == UNDEFINED_POS && random_chance(game, APPLE_SHOW_CHANCE)) {
         game->apple_cooldown = APPLE_TIMER_CAP;
         game->ongoing = random_position(game, &(game->apple));

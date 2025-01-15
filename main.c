@@ -120,7 +120,7 @@ void handle_events(Game * game) {
 }
 
 #define handle_cooldown(cooldown, _default, dt, code_block) do { \
-    if ((cooldown) < 0.f) {     \
+    if ((cooldown) <= 0.f) {    \
         code_block;             \
         cooldown += _default;   \
     } else cooldown -= dt;      \
@@ -181,8 +181,9 @@ int main_loop(
             continue;
         }
 
-        render_game(renderer, game, charmap);
         handle_updates(game, delta_time);
+
+        render_game(renderer, game, charmap);
         
         SDL_Delay((int)(1000 * delta_time));
     }
