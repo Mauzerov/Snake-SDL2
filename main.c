@@ -14,14 +14,14 @@
 #include <SDL2/SDL.h>
 
 void apple_action_shorten(Game * game) {
-    game->snake_size -= SHORTEN_BY;
+    game->snake_size -= APPLE_SHORTEN_BY;
     if (game->snake_size < INITIAL_SNAKE_SIZE)
         game->snake_size = INITIAL_SNAKE_SIZE;
     snake_resize(&game->snake, game->snake_size);
 }
 
 void apple_action_slowdown(Game * game) {
-    game->game_speed_scale -= TIME_SCALE_CHANGE / 2.;
+    game->game_speed_scale -= APPLE_SLOWDOWN_BY;
     if (game->game_speed_scale < INITIAL_TIME_SCALE)
         game->game_speed_scale = INITIAL_TIME_SCALE;
 }

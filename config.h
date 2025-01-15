@@ -25,7 +25,6 @@
 #define LEADERBOARD_FILENAME "snake.score"
 
 // SNAKE DEFAULT
-#define SHORTEN_BY 4
 #define INITIAL_SNAKE_SIZE 5
 #define INITIAL_SNAKE_X    0
 #define INITIAL_SNAKE_Y    0
@@ -52,6 +51,8 @@
 #define APPLE_TIMER_WIDTH 16
 #define APPLE_INTERVAL    10 // seconds
 #define APPLE_SHOW_CHANCE 1 // percent
+#define APPLE_SHORTEN_BY  4
+#define APPLE_SLOWDOWN_BY (TIME_SCALE_CHANGE / 2)
 
 // ANIMATED OBJECTS
 #define ANIMATION_SIZE    2 // pixels (how much bigger)
