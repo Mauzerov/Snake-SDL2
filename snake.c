@@ -47,7 +47,7 @@ void snake_init(Entity ** snake, size_t size) {
         *snake = malloc(sizeof(Entity) * size);
 
     for (size_t i = 0; i < size; i++) {
-        (*snake)[i].x = INITIAL_SNAKE_X + (size - i - 1);
+        (*snake)[i].x = INITIAL_SNAKE_X + ((long)size - i - 1);
         (*snake)[i].y = INITIAL_SNAKE_Y;
     }
 }
@@ -73,7 +73,7 @@ void handle_collectibles(Game * game, Entity ** snake, int * snake_size) {
         game->apple_actions[apple_action_index](game);
         game->apple_cooldown = 0;
     } else if (game->apple.y == UNDEFINED_POS && random_chance(game, APPLE_SHOW_CHANCE)) {
-        game->apple_cooldown = APPLE_TIMER_CAP;
+        game->apple_cooldown = APPLE_INTERVAL;
         game->ongoing = random_position(game, &(game->apple));
     }
     if (is_overlapping(*snake, &(game->berry))) {
@@ -95,7 +95,7 @@ bool handle_porters(Game * game, Entity ** snake) {
     return false;
 }
 
-bool is_snake_overlaping(Entity * snake, int headx, int heady, int snake_size) {
+bool is_new_head_overlaping(Entity * snake, int headx, int heady, int snake_size) {
     Point point = { headx, heady };
     for (int i = 1; i < snake_size; i++) {
         if (is_overlapping(&point, &snake[i]))
@@ -112,7 +112,7 @@ void snake_move(Game * game) {
     Entity ** snake = &(game->snake);
     Entity * head = *snake;
 
-    if (is_snake_overlaping(*snake, head->x, head->y, *snake_size)) {
+    if (is_new_head_overlaping(*snake, head->x, head->y, *snake_size)) {
         game->ongoing = FINISHING;
         return;
     }

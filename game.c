@@ -35,6 +35,10 @@ void porters_init(Game * game) {
     }
 }
 
+void reset_game(Game * game) {
+
+}
+
 void new_game(Game * game) {
     game->snake_size = INITIAL_SNAKE_SIZE;
     game->dx = game->dy = 0;
@@ -67,7 +71,7 @@ void load_game_textures(
             renderer, texture,
             (SDL_Rect) {
                 TEXTURE_SIZE * i, 0,
-                TEXTURE_SIZE, TEXTURE_SIZE * SNAKE_ANIMATION_SIZE
+                TEXTURE_SIZE, -1
             },
             Color_SNAKE_TAIL
         );
@@ -75,7 +79,7 @@ void load_game_textures(
 
     SDL_Rect fruit_rect = {
         TEXTURE_SIZE * Texture_APPLE, 0,
-        TEXTURE_SIZE, TEXTURE_SIZE * 2
+        TEXTURE_SIZE, -1
     };
 
     game->textures[Texture_APPLE] = create_image(

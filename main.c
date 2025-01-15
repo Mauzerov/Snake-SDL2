@@ -21,7 +21,7 @@ void apple_action_shorten(Game * game) {
 }
 
 void apple_action_slowdown(Game * game) {
-    game->game_speed_scale -= TIME_SCALE / 2.;
+    game->game_speed_scale -= TIME_SCALE_CHANGE / 2.;
     if (game->game_speed_scale < INITIAL_TIME_SCALE)
         game->game_speed_scale = INITIAL_TIME_SCALE;
 }
@@ -156,7 +156,7 @@ void handle_updates(Game * game, float delta_time) {
         game->speedup_cooldown,
         SCALE_INTERVAL,
         delta_time,
-        game->game_speed_scale += TIME_SCALE
+        game->game_speed_scale += TIME_SCALE_CHANGE
     );
 }
 

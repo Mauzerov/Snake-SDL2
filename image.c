@@ -89,12 +89,19 @@ Image * create_image(
     SDL_Rect  rect,          // which part of bitmap to crop out
     SDL_Color color          // color to map white to
 ) {
+    // Allow for negative width/height (get size)
+    SDL_QueryTexture(
+        texture, NULL, NULL,
+        (rect.w < 0) ? &rect.w : NULL,
+        (rect.h < 0) ? &rect.h : NULL
+    );
     SDL_Texture * part_texture = SDL_CreateTexture(
         renderer,
         SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET,
         rect.w, rect.h
     );
+    
     SDL_SetTextureBlendMode(part_texture, SDL_BLENDMODE_BLEND);
     // Clear `garbage pixels`
     SDL_SetRenderTarget    (renderer, part_texture);
