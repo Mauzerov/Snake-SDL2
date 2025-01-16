@@ -2,17 +2,18 @@
 #define CONFIG_H
 
 
-#define GAME_SIZE       16 // playable area size
-#define TILE_SIZE       32 // pixels
-#define TEXTURE_SIZE    32 // pixels
-#define CHARMAP_SIZE    16 // number of characters per column/row in charmap.bmp
-#define CHAR_WIDTH      8  // pixels
-#define CHARMAP_MASK    (CHARMAP_SIZE * CHARMAP_SIZE - 1)
+#define GAME_SIZE    16 // playable area size
+#define TILE_SIZE    32 // pixels
+#define TEXTURE_SIZE 32 // pixels
+#define CHARMAP_SIZE 16 // number of characters per column/row in charmap.bmp
+#define CHAR_WIDTH   8  // pixels
+#define CHARMAP_MASK (CHARMAP_SIZE * CHARMAP_SIZE - 1)
 
+#define MAX_RENDER_TEXT_WIDTH 32
+#define GAME_WIDTH (GAME_SIZE * TILE_SIZE)
+#define FONT_SIZE  (GAME_WIDTH / MAX_RENDER_TEXT_WIDTH)
 #define INFO_PANEL_ROWS 3
-#define INFO_PANEL_SIZE (INFO_CHAR_SIZE * INFO_PANEL_ROWS)
-#define INFO_CHAR_SIZE  (TILE_SIZE >> 1)
-#define GAME_WIDTH      (GAME_SIZE * TILE_SIZE)
+#define INFO_PANEL_SIZE (FONT_SIZE * INFO_PANEL_ROWS)
 
 #define MAX_STRING_BUFFER_SIZE 1024
 

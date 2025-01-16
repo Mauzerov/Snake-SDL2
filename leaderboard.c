@@ -127,10 +127,10 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * ga
         game->text_entered ? "" : game->buffer
     );
 
-    char * centered_string = center_string(string, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
+    char * centered_string = center_string(string, GAME_WIDTH / FONT_SIZE);
     SDL_RenderText(
         renderer, charmap, centered_string, Color_FOREGROUND,
-        0, rect.y + 2 * INFO_CHAR_SIZE, INFO_CHAR_SIZE
+        0, rect.y + 2 * FONT_SIZE, FONT_SIZE
     );
     free(centered_string);
 

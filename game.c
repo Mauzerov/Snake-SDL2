@@ -175,7 +175,7 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
     SDL_RenderText(
         renderer, charmap,
         string, fg,
-        0, GAME_WIDTH, INFO_CHAR_SIZE
+        0, GAME_WIDTH, FONT_SIZE
     );
     
     SDL_RenderText(
@@ -185,8 +185,8 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
             string,
             "Score: %04lu\nSpeed: %.2f",
             game->score, game->game_speed_scale
-        ) * INFO_CHAR_SIZE >> 1),
-        GAME_WIDTH, INFO_CHAR_SIZE
+        ) * FONT_SIZE >> 1),
+        GAME_WIDTH, FONT_SIZE
     );
 
     sprintf(string,
@@ -196,6 +196,6 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
     SDL_RenderText(
         renderer, charmap,
         string, fg,
-        0, GAME_WIDTH + INFO_CHAR_SIZE, INFO_CHAR_SIZE
+        0, GAME_WIDTH + FONT_SIZE, FONT_SIZE
     );
 }
