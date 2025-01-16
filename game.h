@@ -106,14 +106,6 @@ void destroy_game_textures(Game * game);
 
 bool can_add_to_leaderboard(Game *);
 
-void render_leaderboard(
-    SDL_Renderer * renderer,
-    SDL_Texture * charmap,
-    Game * game,
-    int records,
-    int top_position
-);
-
 void add_player_to_leaderboard(const char *, size_t, Game *);
 
 void read_player_name(Game *);

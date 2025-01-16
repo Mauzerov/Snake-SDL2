@@ -83,66 +83,56 @@ void add_player_to_leaderboard(
     write_leaderboard(game->leaderboard);
 }
 
-void render_leaderboard(
-    SDL_Renderer * renderer,
-    SDL_Texture * charmap,
-    Game * game,
-    int records,
-    int top_position
-) {
-    char buffer[MAX_STRING_BUFFER_SIZE] = { 0 };
-    for (int i = 0; i < records; i++) {
-        sprintf(
-            buffer, "%d. %-*s: %4lu", i + 1,
-            MAX_NAME_SIZE,
+char * leaderboard_to_string(Game * game, char * buffer) {
+    char line[MAX_STRING_BUFFER_SIZE] = { 0 };
+    for (int i = 0; i < game->records; i++) {
+        sprintf(line, "%d. %-*s: %4lu\n",
+            i + 1, MAX_NAME_SIZE,
             game->leaderboard[i].name,
             game->leaderboard[i].score
         );
-        char * centered_string = center_string(buffer, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
-        SDL_RenderText(
-            renderer, charmap, centered_string, Color_FOREGROUND,
-            0, top_position + (8 + i) * INFO_CHAR_SIZE, INFO_CHAR_SIZE
-        );
-        free(centered_string);
+        strcat(buffer, line);
     }
+    for (int i = game->records; i < LEADERBOARD_SIZE; i++)
+        strcat(buffer, "\n");
+    return buffer;
 }
 
 void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * game) {
-    int line_num = 8 + LEADERBOARD_SIZE;
-
     SDL_Color bg = Color_BLACK;
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
 
-    int top_position = (GAME_WIDTH >> 1) - (line_num) * INFO_CHAR_SIZE;
     SDL_Rect rect = { 
-        0, top_position, 
-        GAME_WIDTH, INFO_CHAR_SIZE * (2 + line_num)
+        0, GAME_WIDTH >> 2, 
+        GAME_WIDTH, GAME_WIDTH >> 1
     };
     SDL_RenderFillRect(renderer, &rect);
 
     char string[MAX_STRING_BUFFER_SIZE] = { 0 };
+    char leaderboard[LEADERBOARD_SIZE * MAX_NAME_SIZE * 2] = { 0 };
 
     sprintf(
         string,
+        "GAME OVER\n\n"
         "Press 'n' to start a new game!\n"
         "Press 'ESC' to quit!\n\n"
         "Your Score %04lu\n"
-        "Leaderboard:\n\n\n\n\n"
+        "Leaderboard:\n"
+        "%s\n"
         "%s %-*s",
         game->score,
+        leaderboard_to_string(game, leaderboard),
         game->text_entered ? "" : "Your Name:",
         MAX_NAME_SIZE,
         game->text_entered ? "" : game->buffer
     );
 
     char * centered_string = center_string(string, GAME_SIZE * GAME_SIZE / CHAR_WIDTH);
-
     SDL_RenderText(
         renderer, charmap, centered_string, Color_FOREGROUND,
-        0, top_position + 2 * INFO_CHAR_SIZE, INFO_CHAR_SIZE
+        0, rect.y + 2 * INFO_CHAR_SIZE, INFO_CHAR_SIZE
     );
     free(centered_string);
 
-    render_leaderboard(renderer, charmap, game, game->records, top_position);
     SDL_RenderPresent(renderer);
 }
