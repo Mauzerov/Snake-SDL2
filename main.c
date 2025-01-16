@@ -13,18 +13,6 @@
 
 #include <SDL2/SDL.h>
 
-void apple_action_shorten(Game * game) {
-    game->snake_size -= APPLE_SHORTEN_BY;
-    if (game->snake_size < INITIAL_SNAKE_SIZE)
-        game->snake_size = INITIAL_SNAKE_SIZE;
-}
-
-void apple_action_slowdown(Game * game) {
-    game->game_speed_scale -= APPLE_SLOWDOWN_BY;
-    if (game->game_speed_scale < INITIAL_TIME_SCALE)
-        game->game_speed_scale = INITIAL_TIME_SCALE;
-}
-
 void update_animations(Game * game) {
     static int animation_frame = 0;
     game->apple.animation_frame++;
@@ -162,7 +150,8 @@ void handle_updates(Game * game, float delta_time) {
 int main_loop(
     SDL_Renderer * renderer,
     Game * game,
-    SDL_Texture * charmap
+    SDL_Texture * charmap,
+    Image * textures[Texture_COUNT]
 ) {
     // TODO: use actual time difference and not a const one
     const float delta_time = 1.f / (float)REFRESH_RATE;
@@ -182,7 +171,7 @@ int main_loop(
 
         handle_updates(game, delta_time);
 
-        render_game(renderer, game, charmap);
+        render_game(renderer, game, charmap, textures);
         
         SDL_Delay((int)(1000 * delta_time));
     }
@@ -213,14 +202,14 @@ int main() {
     }
 
     SDL_Texture * charmap = create_texture(renderer, "charmap.bmp");
-
     SDL_Texture * snake   = create_texture(renderer, "snake.bmp");
 
-    load_game_textures(renderer, &game, snake);
+    Image * textures[Texture_COUNT] = { 0 };
+    load_game_textures(renderer, snake, textures);
 
-    int exit_code = main_loop(renderer, &game, charmap);
+    int exit_code = main_loop(renderer, &game, charmap, textures);
 
-    destroy_game_textures(&game);
+    destroy_game_textures(textures);
 
     SDL_DestroyTexture(charmap);
     

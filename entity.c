@@ -23,8 +23,8 @@ void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture) {
 void draw_porter(
     SDL_Renderer * renderer,
     SDL_Texture * charmap,
-    Game * game,
-    Porter * porter
+    Porter * porter,
+    Image * textures[Texture_COUNT]
 ) {
     SDL_Color fg = Color_FOREGROUND;
     char string[2] = { (char)porter->identifier, 0 };
@@ -38,7 +38,7 @@ void draw_porter(
 
     render_square_image(
         renderer,
-        game->textures[Texture_PORTER],
+        textures[Texture_PORTER],
         &rect, 0, 0
     );
 

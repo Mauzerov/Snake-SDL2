@@ -35,7 +35,7 @@ typedef struct Game {
     size_t buffer_count;
     bool text_entered;
     void (*apple_actions[2])(struct Game*);
-    Image * textures[Texture_COUNT];
+    // Image * textures[Texture_COUNT];
     Player leaderboard[LEADERBOARD_SIZE];
     int records;
 } Game;
@@ -98,11 +98,11 @@ void handle_outofbounds(Game * game);
 
 void load_game_textures(
     SDL_Renderer * renderer,
-    Game * game,
-    SDL_Texture * texture
+    SDL_Texture * texture,
+    Image * textures[Texture_COUNT]
 );
 
-void destroy_game_textures(Game * game);
+void destroy_game_textures(Image * textures[Texture_COUNT]);
 
 bool can_add_to_leaderboard(Game *);
 
@@ -116,10 +116,19 @@ void write_leaderboard(Player[LEADERBOARD_SIZE]);
 
 int order_players(const void *, const void *);
 
-void render_game(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap);
+void render_game(
+    SDL_Renderer * renderer,
+    Game * game,
+    SDL_Texture * charmap,
+    Image * textures[Texture_COUNT]
+);
 
 void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap);
 
 void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * game);
+
+void apple_action_slowdown(Game * game);
+
+void apple_action_shorten(Game * game);
 
 #endif

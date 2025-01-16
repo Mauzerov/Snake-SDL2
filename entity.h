@@ -21,8 +21,8 @@ void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture);
 void draw_porter(
     SDL_Renderer * renderer,
     SDL_Texture * charmap,
-    Game * game,
-    Porter * porter
+    Porter * porter,
+    Image * textures[Texture_COUNT]
 );
 
 void draw_apple_timer(SDL_Renderer * renderer, Game * game);

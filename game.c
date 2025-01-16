@@ -35,7 +35,19 @@ void porters_init(Game * game) {
     }
 }
 
-void reset_game(Game * game) {
+void apple_action_shorten(Game * game) {
+    game->snake_size -= APPLE_SHORTEN_BY;
+    if (game->snake_size < INITIAL_SNAKE_SIZE)
+        game->snake_size = INITIAL_SNAKE_SIZE;
+}
+
+void apple_action_slowdown(Game * game) {
+    game->game_speed_scale -= APPLE_SLOWDOWN_BY;
+    if (game->game_speed_scale < INITIAL_TIME_SCALE)
+        game->game_speed_scale = INITIAL_TIME_SCALE;
+}
+
+void reset_game(Game * g) {
 
 }
 
@@ -48,6 +60,9 @@ void new_game(Game * game) {
     game->seed = time( NULL );
     game->text_entered = false;
     game->apple_cooldown = game->score = 0;
+    game->animation_cooldown = 0;
+    game->speedup_cooldown = SPEED_SCALE_INTERVAL;
+    game->move_cooldown = 1.f / (FRAMES_PER_SECOND * game->game_speed_scale);
 
     memset(game->buffer, 0, sizeof(game->buffer));
 
@@ -58,17 +73,17 @@ void new_game(Game * game) {
 
     game->apple.x = game->apple.y = UNDEFINED_POS;
     random_position(game, &game->berry);
-    
+
     game->records = read_leaderboard(game->leaderboard);
 }
 
 void load_game_textures(
     SDL_Renderer * renderer,
-    Game * game,
-    SDL_Texture * texture
+    SDL_Texture * texture,
+    Image * textures[Texture_COUNT]
 ) {
     for (int i = Texture_TAIL; i <= Texture_HEAD; i++) {
-        game->textures[i] = create_image(
+        textures[i] = create_image(
             renderer, texture,
             (SDL_Rect) {
                 TEXTURE_SIZE * i, 0,
@@ -83,18 +98,18 @@ void load_game_textures(
         TEXTURE_SIZE, -1
     };
 
-    game->textures[Texture_APPLE] = create_image(
+    textures[Texture_APPLE] = create_image(
         renderer, texture,
         fruit_rect,
         Color_APPLE
     );
-    game->textures[Texture_BERRY] = create_image(
+    textures[Texture_BERRY] = create_image(
         renderer, texture,
         fruit_rect,
         Color_BERRY
     );
 
-    game->textures[Texture_PORTER] = create_image(
+    textures[Texture_PORTER] = create_image(
         renderer, texture,
         (SDL_Rect) {
             TEXTURE_SIZE * Texture_HEAD,
@@ -106,13 +121,18 @@ void load_game_textures(
     );
 }
 
-void destroy_game_textures(Game * game) {
-    for (int i = Texture_TAIL; i < Texture_COUNT; i++)
-        destroy_image(game->textures[i]);
+void destroy_game_textures(Image * textures[Texture_COUNT]) {
+    for (int i = 0; i < Texture_COUNT; i++)
+        destroy_image(textures[i]);
 }
 
 
-void render_game(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
+void render_game(
+    SDL_Renderer * renderer,
+    Game * game,
+    SDL_Texture * charmap,
+    Image * textures[Texture_COUNT]
+) {
     SDL_Color bg = Color_BACKGROUND;
 
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
@@ -120,13 +140,13 @@ void render_game(SDL_Renderer * renderer, Game * game, SDL_Texture * charmap) {
     draw_apple_timer(renderer, game);
 
     for (int i = 0; i < PORTER_COUNT * 2; i++) {
-        draw_porter(renderer, charmap, game, &game->porters[i]);
+        draw_porter(renderer, charmap, &game->porters[i], textures);
     }
 
-    draw_entity(renderer, &(game->apple), game->textures[Texture_APPLE]);
-    draw_entity(renderer, &(game->berry), game->textures[Texture_BERRY]);
+    draw_entity(renderer, &(game->apple), textures[Texture_APPLE]);
+    draw_entity(renderer, &(game->berry), textures[Texture_BERRY]);
 
-    render_snake(renderer, game->snake, game->snake_size, game->textures);
+    render_snake(renderer, game->snake, game->snake_size, textures);
 
     render_game_info(renderer, game, charmap);
     
@@ -142,7 +162,7 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
     SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, 255);
     SDL_RenderFillRect(renderer, &bg_rect);
 
-    static char string[64] = { 0 };
+    static char string[MAX_STRING_BUFFER_SIZE] = { 0 };
 
     struct tm elapsed_time = (struct tm) {
         .tm_sec = game->elapsed_time

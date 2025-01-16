@@ -14,9 +14,6 @@
 #define INFO_CHAR_SIZE  (TILE_SIZE >> 1)
 #define GAME_WIDTH      (GAME_SIZE * TILE_SIZE)
 
-#define WINDOW_WIDTH    (GAME_WIDTH + APPLE_TIMER_WIDTH)
-#define WINDOW_HEIGHT   (GAME_WIDTH + INFO_PANEL_SIZE)
-
 #define MAX_STRING_BUFFER_SIZE 1024
 
 // FILE NAMES
@@ -48,7 +45,7 @@
 #define BERRY_SCORE 1
 
 // APPLE a.ka RED DOT
-#define APPLE_TIMER_WIDTH 16
+#define APPLE_TIMER_WIDTH (TILE_SIZE >> 1)
 #define APPLE_INTERVAL    10 // seconds
 #define APPLE_SHOW_CHANCE 1 // percent
 #define APPLE_SHORTEN_BY  4
@@ -77,5 +74,9 @@
 #define FINISHING 0
 #define FINISHED -1
 #define TRUE      1
+
+
+#define WINDOW_WIDTH  (GAME_WIDTH + APPLE_TIMER_WIDTH)
+#define WINDOW_HEIGHT (GAME_WIDTH + INFO_PANEL_SIZE)
 
 #endif
