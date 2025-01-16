@@ -20,6 +20,8 @@
 #define SAVE_FILE_NAME       "snake_game.save"
 #define CONF_FILE_NAME       "snake.config"
 #define LEADERBOARD_FILENAME "snake.score"
+#define TEXTURE_FILE_NAME    "snake.bmp"
+#define FONT_FILE_NAME       "charmap.bmp"
 
 // SNAKE DEFAULT
 #define INITIAL_SNAKE_SIZE 5

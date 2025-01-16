@@ -201,8 +201,8 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    SDL_Texture * charmap = create_texture(renderer, "charmap.bmp");
-    SDL_Texture * snake   = create_texture(renderer, "snake.bmp");
+    SDL_Texture * charmap = create_texture(renderer, FONT_FILE_NAME);
+    SDL_Texture * snake   = create_texture(renderer, TEXTURE_FILE_NAME);
 
     Image * textures[Texture_COUNT] = { 0 };
     load_game_textures(renderer, snake, textures);
