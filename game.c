@@ -47,10 +47,6 @@ void apple_action_slowdown(Game * game) {
         game->game_speed_scale = INITIAL_TIME_SCALE;
 }
 
-void reset_game(Game * g) {
-
-}
-
 void new_game(Game * game) {
     game->snake_size = INITIAL_SNAKE_SIZE;
     game->dx = game->dy = 0;
