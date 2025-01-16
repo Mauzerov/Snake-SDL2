@@ -58,6 +58,7 @@ void new_game(Game * game) {
 
     game->apple.x = game->apple.y = UNDEFINED_POS;
     random_position(game, &game->berry);
+    
     game->records = read_leaderboard(game->leaderboard);
 }
 

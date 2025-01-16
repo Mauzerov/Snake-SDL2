@@ -23,9 +23,13 @@ bool _random_position(Game * game, Point * entity) {
             }
         }
 
+        if (is_overlapping(&game->berry, entity)
+        ||  is_overlapping(&game->apple, entity)) {
+            continue;
+        }
+
         for (int i = 0; i < PORTER_COUNT * 2; i++) {
-            if ((Point *)&game->porters[i] != entity
-                    && is_overlapping(entity, &game->porters[i])) {
+            if (is_overlapping(entity, &game->porters[i])) {
                 valid = false;
                 break;
             }

@@ -46,7 +46,8 @@ typedef struct Game {
 #define is_outofbounds2(x, y) _is_outofbounds(x, y)
 
 #define _is_overlapping(a, b) \
-    ((a)->x == (b)->x && (a)->y == (b)->y)
+    ((a) != (b) &&            \
+    ((a)->x == (b)->x && (a)->y == (b)->y))
 #define is_overlapping(a, b) _is_overlapping((Point*)a, (Point*)b)
 
 int save_rand(Game * game);
