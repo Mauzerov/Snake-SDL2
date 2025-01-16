@@ -62,7 +62,7 @@ void new_game(Game * game) {
     game->apple_cooldown = game->score = 0;
     game->animation_cooldown = 0;
     game->speedup_cooldown = SPEED_SCALE_INTERVAL;
-    game->move_cooldown = 1.f / (FRAMES_PER_SECOND * game->game_speed_scale);
+    game->move_cooldown = 1.f / FRAMES_PER_SECOND;
 
     memset(game->buffer, 0, sizeof(game->buffer));
 

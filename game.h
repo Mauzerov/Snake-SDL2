@@ -35,7 +35,6 @@ typedef struct Game {
     size_t buffer_count;
     bool text_entered;
     void (*apple_actions[2])(struct Game*);
-    // Image * textures[Texture_COUNT];
     Player leaderboard[LEADERBOARD_SIZE];
     int records;
 } Game;
