@@ -62,6 +62,7 @@ bool _random_position(Game * game, Point * entity);
     file_fn(file, "%d %d\n", g->apple.x, g->apple.y);       \
     file_fn(file, "%d %d\n", g->berry.x, g->berry.y);       \
     file_fn(file, "%d\n", g->snake_size);                   \
+    snake_resize(&game->snake, game->snake_size);           \
     /* note that in the for loop `game` is used */          \
     for (size_t i = 0; i < game->snake_size; i++) {         \
         file_fn(file, "%d %d\n",                            \
