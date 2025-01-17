@@ -29,7 +29,8 @@ typedef struct Game {
     unsigned long score;
     int seed;
     Porter porters[PORTER_COUNT * 2];
-    int dx, dy;
+    Point delta, prev;
+    // int dx, dy;
     int ongoing;
     char buffer[MAX_NAME_SIZE + 1];
     size_t buffer_count;

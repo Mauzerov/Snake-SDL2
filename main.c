@@ -22,28 +22,29 @@ void update_animations(Game * game) {
 }
 
 void handle_keyboard_event(SDL_KeyboardEvent * e, Game * game) {
-    int * dx = &game->dx, *dy = &game->dy;
+    int * dx = &game->delta.x, *dy = &game->delta.y;
+    int * px = &game->prev.x,  *py = &game->prev.y;
     if (e->repeat)
         return;
     switch (e->keysym.sym) {
     // Movement
     case SDLK_a:    
-    case SDLK_LEFT:  if (*dx != +1) {
+    case SDLK_LEFT:  if (*px != +1) {
         *dx = -1; *dy = +0;
     }
         break;
     case SDLK_w:
-    case SDLK_UP:    if (*dy != +1) {
+    case SDLK_UP:    if (*py != +1) {
         *dx = +0;  *dy = -1;
     }
         break;
     case SDLK_d:
-    case SDLK_RIGHT: if (*dx != -1) {
+    case SDLK_RIGHT: if (*px != -1) {
         *dx = +1;  *dy = +0;
     }
         break;
     case SDLK_s:
-    case SDLK_DOWN:  if (*dy != -1) {
+    case SDLK_DOWN:  if (*py != -1) {
         *dx = +0;  *dy = +1;
     }
         break;
@@ -114,7 +115,7 @@ void handle_events(Game * game) {
 } while (0)
 
 void handle_updates(Game * game, float delta_time) {
-    if (!game->dx && !game->dy)
+    if (!game->delta.x && !game->delta.y)
         return;
     game->elapsed_time += delta_time;
 

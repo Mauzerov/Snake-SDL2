@@ -105,33 +105,36 @@ bool is_new_head_overlaping(Entity * snake, int headx, int heady, int snake_size
 }
 
 void snake_move(Game * game) {
-    if (!(game->dx != 0 || game->dy != 0) && "snake_move should only be called when the snek can move")
+    if (!(game->delta.x != 0 || game->delta.y != 0) && "snake_move should only be called when the snek can move")
         return;
 
     int * snake_size = &(game->snake_size);
     Entity ** snake = &(game->snake);
     Entity * head = *snake;
+    Point * delta = &game->delta;
 
     if (is_new_head_overlaping(*snake, head->x, head->y, *snake_size)) {
         game->ongoing = FINISHING;
         return;
     }
 
-    if (is_outofbounds2(head->x + game->dx, head->y + game->dy))
-        rotate90(&game->dx, &game->dy);
+    if (is_outofbounds2(head->x + delta->x, head->y + delta->y))
+        rotate90(&delta->x, &delta->y);
     // if snake is still out of bounds
-    if (is_outofbounds2(head->x + game->dx, head->y + game->dy))
-        rotate180(&game->dx, &game->dy);
+    if (is_outofbounds2(head->x + delta->x, head->y + delta->y))
+        rotate180(&delta->x, &delta->y);
 
     Entity new_head = (Entity) {
-        head->x + game->dx,
-        head->y + game->dy,
+        head->x + delta->x,
+        head->y + delta->y,
     };
 
     handle_collectibles(game, snake, snake_size);
 
     memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
     memcpy((*snake), &new_head, sizeof(Entity));
+
+    memcpy(&game->prev, &delta, sizeof(Point));
 
     handle_porters(game, snake);
 }

@@ -17,8 +17,9 @@
             g->snake[i].x, g->snake[i].y);                  \
     }                                                       \
     file_fn(file, "%f\n", g->elapsed_time);                 \
-    file_fn(file, "%d %d %f %f %f %f %f\n",                 \
-        g->dx, g->dy,                                       \
+    file_fn(file, "%d %d\n", g->delta.x, g->delta.y);       \
+    file_fn(file, "%d %d\n", g->prev.x,  g->prev.y );       \
+    file_fn(file, "%f %f %f %f %f\n",                       \
         g->apple_cooldown,                                  \
         g->move_cooldown,                                   \
         g->animation_cooldown,                              \
@@ -77,7 +78,8 @@ void apple_action_slowdown(Game * game) {
 
 void new_game(Game * game) {
     game->snake_size = INITIAL_SNAKE_SIZE;
-    game->dx = game->dy = 0;
+    game->delta.x = game->delta.y = 0;
+    game->prev.x = game->prev.y = 0;
     game->elapsed_time = 0.f;
     game->game_speed_scale = INITIAL_TIME_SCALE;
     game->ongoing = TRUE;
