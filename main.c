@@ -153,10 +153,12 @@ int main_loop(
     SDL_Texture * charmap,
     Image * textures[Texture_COUNT]
 ) {
-    // TODO: use actual time difference and not a const one
-    const float delta_time = 1.f / (float)REFRESH_RATE;
+    unsigned long prev_ticks = SDL_GetTicks();
 
     while (1) {
+        unsigned long long current_ticks = SDL_GetTicks();
+        float delta_time = (current_ticks - prev_ticks) * 0.001f;
+
         handle_events(game);
 
         if (game->ongoing <= FINISHING) {
@@ -173,7 +175,9 @@ int main_loop(
 
         render_game(renderer, game, charmap, textures);
         
-        SDL_Delay((int)(1000 * delta_time));
+        prev_ticks = current_ticks;
+
+        SDL_Delay((int)(1000.f / (float)REFRESH_RATE));
     }
 }
 
