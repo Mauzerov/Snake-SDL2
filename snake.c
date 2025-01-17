@@ -134,7 +134,7 @@ void snake_move(Game * game) {
     memmove((*snake) + 1, (*snake), sizeof(Entity) * (*snake_size - 1));
     memcpy((*snake), &new_head, sizeof(Entity));
 
-    memcpy(&game->prev, &delta, sizeof(Point));
+    memcpy(&game->prev, delta, sizeof(Point));
 
     handle_porters(game, snake);
 }
