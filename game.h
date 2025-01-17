@@ -57,34 +57,6 @@ bool _random_position(Game * game, Point * entity);
 
 #define random_chance(game, chance) ((float)(save_rand(game) % 10000) / 100.f <= (float)chance)
 
-#define save_file_operattion(file_fn, file, g, game) do {   \
-    file_fn(file, "%d %d\n", g->apple.x, g->apple.y);       \
-    file_fn(file, "%d %d\n", g->berry.x, g->berry.y);       \
-    file_fn(file, "%d\n", g->snake_size);                   \
-    snake_resize(&game->snake, game->snake_size);           \
-    /* note that in the for loop `game` is used */          \
-    for (size_t i = 0; i < game->snake_size; i++) {         \
-        file_fn(file, "%d %d\n",                            \
-            g->snake[i].x, g->snake[i].y);                  \
-    }                                                       \
-    file_fn(file, "%f\n", g->elapsed_time);                 \
-    file_fn(file, "%d %d %f %f %f %f %f\n",                 \
-        g->dx, g->dy,                                       \
-        g->apple_cooldown,                                  \
-        g->move_cooldown,                                   \
-        g->animation_cooldown,                              \
-        g->speedup_cooldown,                                \
-        g->game_speed_scale                                 \
-    );                                                      \
-    file_fn(file, "%lu %d\n", g->score, g->seed);           \
-    for (size_t i = 0; i < PORTER_COUNT * 2; i++) {         \
-        file_fn(file, "%d %d %d\n",                         \
-            g->porters[i].x, g->porters[i].y,               \
-            g->porters[i].identifier);                      \
-    }                                                       \
-    /* ongoing / buffer / leaderboard / textures unchanged*/\
-} while (0)
-
 void porters_init(Game * game);
 
 void save_game(Game * game);
