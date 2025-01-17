@@ -86,7 +86,7 @@ void add_player_to_leaderboard(
 char * leaderboard_to_string(Game * game, char * buffer) {
     char line[MAX_STRING_BUFFER_SIZE] = { 0 };
     for (int i = 0; i < game->records; i++) {
-        sprintf(line, "%d. %-*s: %4lu\n",
+        sprintf(line, "%d. %-*s: %04lu\n",
             i + 1, MAX_NAME_SIZE,
             game->leaderboard[i].name,
             game->leaderboard[i].score
@@ -116,7 +116,7 @@ void render_end_screen(SDL_Renderer * renderer, SDL_Texture * charmap, Game * ga
         "GAME OVER\n\n"
         "Press 'n' to start a new game!\n"
         "Press 'ESC' to quit!\n\n"
-        "Your Score %04lu\n"
+        "Your Score: %04lu\n"
         "Leaderboard:\n"
         "%s\n"
         "%s %-*s",
