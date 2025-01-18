@@ -2,6 +2,14 @@
 
 #include "image.h"
 
+/*
+RRRRR  EEEEE NN   N DDDDD  EEEEE RRRRR  
+RR  RR EE    NNN  N DD  DD EE    RR  RR 
+RRRRR  EEEE  N NN N DD  DD EEEE  RRRRR  
+RR  RR EE    N  NNN DD  DD EE    RR  RR 
+RR  RR EEEEE N   NN DDDDD  EEEEE RR  RR
+*/
+
 Direction _get_direction(Point * prev, Point * curr) {
     if (prev->x + 1 == curr->x && prev->y == curr->y)
         return Right;
@@ -47,6 +55,14 @@ void render_square_image(
         0
     );  
 }
+
+/**
+IIII NN   N IIII TTTTTT 
+ II  NNN  N  II  TTTTTT 
+ II  N NN N  II    TT   
+ II  N  NNN  II    TT   
+IIII N   NN IIII   TT  
+**/
 
 SDL_Texture * create_transparent_texture(
     SDL_Renderer * renderer,

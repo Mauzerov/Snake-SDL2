@@ -3,6 +3,14 @@
 #include "game.h"
 #include "image.h"
 
+/*
+RRRRR  EEEEE NN   N DDDDD  EEEEE RRRRR  
+RR  RR EE    NNN  N DD  DD EE    RR  RR 
+RRRRR  EEEE  N NN N DD  DD EEEE  RRRRR  
+RR  RR EE    N  NNN DD  DD EE    RR  RR 
+RR  RR EEEEE N   NN DDDDD  EEEEE RR  RR
+*/
+
 void draw_entity(SDL_Renderer * renderer, Entity * entity, Image * texture) {
     SDL_Rect fill_rect = (SDL_Rect) {
         entity->x * TILE_SIZE,

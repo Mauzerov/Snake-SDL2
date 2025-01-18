@@ -6,6 +6,14 @@
 #include "image.h"
 #include "text.h"
 
+/**
+ SSSSS   AA   V    V EEEEE     EEEEE IIII LL    EEEEE 
+SS      AAAA  VV  VV EE        EE     II  LL    EE    
+ SSSS   A  A  VV  VV EEEE      EEEE   II  LL    EEEE  
+    SS AAAAAA  VVVV  EE        EE     II  LL    EE    
+SSSSS  AA  AA   VV   EEEEE     EE    IIII LLLLL EEEEE
+**/
+
 #define save_file_operattion(file_fn, file, g, game) do {   \
     file_fn(file, "%d %d\n", g->apple.x, g->apple.y);       \
     file_fn(file, "%d %d\n", g->berry.x, g->berry.y);       \
@@ -52,6 +60,14 @@ void load_game(Game * game) {
     srand(game->seed);
     fclose(file);
 }
+
+/**
+IIII NN   N IIII TTTTTT 
+ II  NNN  N  II  TTTTTT 
+ II  N NN N  II    TT   
+ II  N  NNN  II    TT   
+IIII N   NN IIII   TT  
+**/
 
 void porters_init(Game * game) {
     for (int i = 0; i < PORTER_COUNT * 2; i += 2) {
@@ -103,6 +119,14 @@ void new_game(Game * game) {
     game->records = read_leaderboard(game->leaderboard);
 }
 
+/**
+TTTTTT EEEEE X   XX TTTTTT UU  UU RRRRR  EEEEE  SSSSS 
+TTTTTT EE     X XX  TTTTTT UU  UU RR  RR EE    SS     
+  TT   EEEE    XX     TT   UU  UU RRRRR  EEEE   SSSS  
+  TT   EE     XX X    TT   UUUUUU RR  RR EE        SS 
+  TT   EEEEE XX   X   TT    UUUU  RR  RR EEEEE SSSSS  
+**/
+
 void load_game_textures(
     SDL_Renderer * renderer,
     SDL_Texture * texture,
@@ -152,6 +176,13 @@ void destroy_game_textures(Image * textures[Texture_COUNT]) {
         destroy_image(textures[i]);
 }
 
+/**
+RRRRR  EEEEE NN   N DDDDD  EEEEE RRRRR  
+RR  RR EE    NNN  N DD  DD EE    RR  RR 
+RRRRR  EEEE  N NN N DD  DD EEEE  RRRRR  
+RR  RR EE    N  NNN DD  DD EE    RR  RR 
+RR  RR EEEEE N   NN DDDDD  EEEEE RR  RR 
+**/
 
 void render_game(
     SDL_Renderer * renderer,

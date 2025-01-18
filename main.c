@@ -13,6 +13,14 @@
 
 #include <SDL2/SDL.h>
 
+/**
+RRRRR    AA   NN   N DDDDD   OOOOO  MM   MM 
+RR  RR  AAAA  NNN  N DD  DD OO   OO MMM MMM 
+RRRRR   A  A  N NN N DD  DD OO   OO M MMM M 
+RR  RR AAAAAA N  NNN DD  DD OO   OO M  M  M 
+RR  RR AA  AA N   NN DDDDD   OOOOO  M     M
+**/
+
 int save_rand(Game * game) {
     return game->seed = rand();
 }
@@ -48,6 +56,13 @@ bool _random_position(Game * game, Point * entity) {
     return valid;
 }
 
+/**
+EEEEE V    V EEEEE NN   N TTTTTT  SSSSS 
+EE    VV  VV EE    NNN  N TTTTTT SS     
+EEEE  VV  VV EEEE  N NN N   TT    SSSS  
+EE     VVVV  EE    N  NNN   TT       SS 
+EEEEE   VV   EEEEE N   NN   TT   SSSSS 
+**/
 
 void update_animations(Game * game) {
     static int animation_frame = 0;
@@ -179,6 +194,13 @@ void handle_updates(Game * game, float delta_time) {
         game->game_speed_scale += TIME_SCALE_CHANGE
     );
 }
+/**
+MM   MM   AA   IIII NN   N     LL     OOOOO   OOOOO  PPPPP  
+MMM MMM  AAAA   II  NNN  N     LL    OO   OO OO   OO PP  PP 
+M MMM M  A  A   II  N NN N     LL    OO   OO OO   OO PPPPP  
+M  M  M AAAAAA  II  N  NNN     LL    OO   OO OO   OO PP     
+M     M AA  AA IIII N   NN     LLLLL  OOOOO   OOOOO  PP     
+**/
 
 int main_loop(
     SDL_Renderer * renderer,

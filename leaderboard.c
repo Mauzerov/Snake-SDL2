@@ -1,10 +1,17 @@
 #include <string.h>
 
-
 #include <SDL2/SDL_log.h>
 #include "text.h"
 #include "game.h"
 
+
+/*
+ SSSSS  CCCC   OOOOO  RRRRR  EEEEE     IIII    // OOOOO  
+SS     CC  CC OO   OO RR  RR EE         II    // OO   OO 
+ SSSS  CC     OO   OO RRRRR  EEEE       II    /  OO   OO 
+    SS CC  CC OO   OO RR  RR EE         II   //  OO   OO 
+SSSSS   CCCC   OOOOO  RR  RR EEEEE     IIII //    OOOOO  
+*/
 
 int order_players(const void * a, const void * b) {
     return  ((Player *)b)->score - ((Player *)a)->score;
@@ -81,6 +88,14 @@ void add_player_to_leaderboard(
 
     write_leaderboard(game->leaderboard);
 }
+
+/*
+RRRRR  EEEEE NN   N DDDDD  EEEEE RRRRR  
+RR  RR EE    NNN  N DD  DD EE    RR  RR 
+RRRRR  EEEE  N NN N DD  DD EEEE  RRRRR  
+RR  RR EE    N  NNN DD  DD EE    RR  RR 
+RR  RR EEEEE N   NN DDDDD  EEEEE RR  RR
+*/
 
 char * leaderboard_to_string(Game * game, char * buffer) {
     char line[MAX_STRING_BUFFER_SIZE] = { 0 };

@@ -4,6 +4,14 @@
 
 #include <assert.h>
 
+/**
+RRRRR  EEEEE NN   N DDDDD  EEEEE RRRRR  
+RR  RR EE    NNN  N DD  DD EE    RR  RR 
+RRRRR  EEEE  N NN N DD  DD EEEE  RRRRR  
+RR  RR EE    N  NNN DD  DD EE    RR  RR 
+RR  RR EEEEE N   NN DDDDD  EEEEE RR  RR
+**/
+
 void render_snake(
     SDL_Renderer * renderer,
     Entity * snake,
@@ -51,6 +59,14 @@ void snake_init(Entity ** snake, size_t size) {
         (*snake)[i].y = INITIAL_SNAKE_Y;
     }
 }
+
+/*
+ CCCC   OOOOO  LL    LL    IIII  SSSSS IIII  OOOOO  NN   N  SSSSS 
+CC  CC OO   OO LL    LL     II  SS      II  OO   OO NNN  N SS     
+CC     OO   OO LL    LL     II   SSSS   II  OO   OO N NN N  SSSS  
+CC  CC OO   OO LL    LL     II      SS  II  OO   OO N  NNN     SS 
+ CCCC   OOOOO  LLLLL LLLLL IIII SSSSS  IIII  OOOOO  N   NN SSSSS  
+*/
 
 void rotate90(int * dx, int * dy) {
     int tmp = *dx;
@@ -103,6 +119,14 @@ bool is_head_overlaping(Entity * snake, int headx, int heady, int snake_size) {
     }
     return false;
 }
+
+/*
+MM   MM  OOOOO  V    V EEEEE MM   MM EEEEE NN   N TTTTTT 
+MMM MMM OO   OO VV  VV EE    MMM MMM EE    NNN  N TTTTTT 
+M MMM M OO   OO VV  VV EEEE  M MMM M EEEE  N NN N   TT   
+M  M  M OO   OO  VVVV  EE    M  M  M EE    N  NNN   TT   
+M     M  OOOOO    VV   EEEEE M     M EEEEE N   NN   TT   
+*/
 
 void snake_move(Game * game) {
     if (!(game->delta.x != 0 || game->delta.y != 0) && "snake_move should only be called when the snek can move")
