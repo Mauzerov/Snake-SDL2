@@ -28,22 +28,18 @@ void handle_keyboard_event(SDL_KeyboardEvent * e, Game * game) {
         return;
     switch (e->keysym.sym) {
     // Movement
-    case SDLK_a:    
     case SDLK_LEFT:  if (*px != +1) {
         *dx = -1; *dy = +0;
     }
         break;
-    case SDLK_w:
     case SDLK_UP:    if (*py != +1) {
         *dx = +0;  *dy = -1;
     }
         break;
-    case SDLK_d:
     case SDLK_RIGHT: if (*px != -1) {
         *dx = +1;  *dy = +0;
     }
         break;
-    case SDLK_s:
     case SDLK_DOWN:  if (*py != -1) {
         *dx = +0;  *dy = +1;
     }
@@ -53,7 +49,7 @@ void handle_keyboard_event(SDL_KeyboardEvent * e, Game * game) {
         new_game(game);
         break;
     }
-    case SDLK_o: { // swap to 's' before deadline
+    case SDLK_s: { // swap to 's' before deadline
         save_game(game);
         break;
     }
