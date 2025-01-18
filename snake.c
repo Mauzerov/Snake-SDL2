@@ -68,7 +68,7 @@ void snake_resize(Entity ** snake, int snake_size) {
 
 void handle_collectibles(Game * game, Entity ** snake, int * snake_size) {
     if (is_overlapping(*snake, &(game->apple))) {
-        int apple_action_index = save_rand(game) % APLLE_ACTION;
+        int apple_action_index = save_rand(game) % APLLE_ACTIONS;
         game->score += APPLE_SCORE;
         game->apple_actions[apple_action_index](game);
         game->apple_cooldown = 0;

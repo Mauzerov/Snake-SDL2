@@ -34,7 +34,7 @@ typedef struct Game {
     char buffer[MAX_NAME_SIZE + 1];
     size_t buffer_count;
     bool text_entered;
-    void (*apple_actions[APLLE_ACTION])(struct Game*);
+    void (*apple_actions[APLLE_ACTIONS])(struct Game*);
     Player leaderboard[LEADERBOARD_SIZE];
     int records;
 } Game;

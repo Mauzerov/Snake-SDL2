@@ -50,7 +50,7 @@
 // APPLE a.ka RED DOT
 #define APPLE_TIMER_WIDTH (TILE_SIZE >> 1)
 #define APPLE_INTERVAL    10 // seconds
-#define APLLE_ACTION      2
+#define APLLE_ACTIONS     2
 #define APPLE_SHOW_CHANCE 1 // percent
 #define APPLE_SHORTEN_BY  4
 #define APPLE_SLOWDOWN_BY (TIME_SCALE_CHANGE / 2)
