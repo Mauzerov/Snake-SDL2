@@ -248,7 +248,8 @@ void render_game_info(SDL_Renderer * renderer, Game * game, SDL_Texture * charma
 
     sprintf(string,
         "Mandatory: 1,2,3,4\n"
-        "Optional:  A,B,C,D,E,F,G,H"
+        "Optional:  A,B,C,D,E,F,G,H\n"
+        "Author: Mateusz Mazurek  203223"
     );
     SDL_RenderText(
         renderer, charmap,
