@@ -1,5 +1,5 @@
 #include "entity.h"
-#include "renderer.h"
+#include "text.h"
 #include "game.h"
 #include "image.h"
 

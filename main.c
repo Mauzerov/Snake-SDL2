@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "renderer.h"
+#include "text.h"
 #include "config.h"
 #include "image.h"
 #include "snake.h"

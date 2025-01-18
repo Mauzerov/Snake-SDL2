@@ -1,4 +1,4 @@
-#include "renderer.h"
+#include "text.h"
 #include "config.h"
 #include "image.h"
 

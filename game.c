@@ -4,7 +4,7 @@
 #include "game.h"
 #include "snake.h"
 #include "image.h"
-#include "renderer.h"
+#include "text.h"
 
 #define save_file_operattion(file_fn, file, g, game) do {   \
     file_fn(file, "%d %d\n", g->apple.x, g->apple.y);       \
