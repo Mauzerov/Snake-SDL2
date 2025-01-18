@@ -95,7 +95,7 @@ bool handle_porters(Game * game, Entity ** snake) {
     return false;
 }
 
-bool is_new_head_overlaping(Entity * snake, int headx, int heady, int snake_size) {
+bool is_head_overlaping(Entity * snake, int headx, int heady, int snake_size) {
     Point point = { headx, heady };
     for (int i = 1; i < snake_size; i++) {
         if (is_overlapping(&point, &snake[i]))
@@ -113,7 +113,7 @@ void snake_move(Game * game) {
     Entity * head = *snake;
     Point * delta = &game->delta;
 
-    if (is_new_head_overlaping(*snake, head->x, head->y, *snake_size)) {
+    if (is_head_overlaping(*snake, head->x, head->y, *snake_size)) {
         game->ongoing = FINISHING;
         return;
     }
