@@ -49,7 +49,7 @@ void handle_keyboard_event(SDL_KeyboardEvent * e, Game * game) {
         new_game(game);
         break;
     }
-    case SDLK_s: { // swap to 's' before deadline
+    case SDLK_s: {
         save_game(game);
         break;
     }

@@ -58,7 +58,6 @@ void add_player_to_leaderboard(
     size_t string_size,
     Game * game
 ) {
-    // TODO: to allow continuous play change this to game->leaderboard
     int i, leaderboard_count = read_leaderboard(game->leaderboard);
 
     // assume players are sorted from lowest to highest point

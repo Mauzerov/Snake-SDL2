@@ -30,12 +30,11 @@ typedef struct Game {
     int seed;
     Porter porters[PORTER_COUNT * 2];
     Point delta, prev;
-    // int dx, dy;
     int ongoing;
     char buffer[MAX_NAME_SIZE + 1];
     size_t buffer_count;
     bool text_entered;
-    void (*apple_actions[2])(struct Game*);
+    void (*apple_actions[APLLE_ACTION])(struct Game*);
     Player leaderboard[LEADERBOARD_SIZE];
     int records;
 } Game;
